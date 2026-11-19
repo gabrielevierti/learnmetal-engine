@@ -262,7 +262,7 @@ public final class Engine {
         scene.updateTransforms()
         updateParticles(scene, dt: time.delta)
 
-        canvas.begin(size: screenSize)
+        canvas.begin(size: screenSize, pixelsPerPoint: surface?.contentScale ?? Float(config.captureScale))
         game.draw(self, canvas: canvas)
         if showsColliders { drawColliders() }
         if showsStatistics { drawStatistics() }

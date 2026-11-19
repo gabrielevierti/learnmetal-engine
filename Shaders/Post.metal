@@ -72,15 +72,51 @@ static float3 acesFilm(float3 x) {
     return saturate((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14));
 }
 
-// The last pass: scene plus bloom, exposure, tone mapping, vignette. The result is
-// linear; the drawable has an sRGB format, so Metal applies the gamma curve itself.
+// A different random number for every pixel and every moment.
+static float videoNoise(float2 p, float time) {
+    return fract(sin(dot(p + fract(time * 7.13) * float2(37.0, 17.0), float2(12.9898, 78.233))) * 43758.5453);
+}
+
+// The last pass: the lens, scene plus bloom, exposure, tone mapping, vignette, and the
+// flaws of a video link. The result is linear; the drawable has an sRGB format, so
+// Metal applies the gamma curve itself.
 fragment float4 fragment_tonemap(FullscreenOut in [[stage_in]],
                                  constant PostUniforms &post [[buffer(LMBufferPass)]],
                                  texture2d<float> scene [[texture(0)]],
                                  texture2d<float> bloom [[texture(1)]],
                                  sampler linearSampler [[sampler(LMSamplerLinearClamp)]]) {
-    float3 hdr = scene.sample(linearSampler, in.uv).rgb;
-    hdr += bloom.sample(linearSampler, in.uv).rgb * post.bloomIntensity;
+    float2 uv = in.uv;
+
+    // A weak analog video signal tears: whole lines of the picture slide sideways.
+    if (post.interference > 0.0) {
+        float band = floor(uv.y * 90.0);
+        float tear = videoNoise(float2(band, 3.0), floor(post.time * 24.0));
+        uv.x += (tear - 0.5) * 0.12 * post.interference * step(1.0 - post.interference * 0.6, videoNoise(float2(7.0, band), floor(post.time * 12.0)));
+    }
+
+    // A wide lens bends the picture: the middle is magnified and the edges are squeezed,
+    // so straight lines bow outward ("barrel distortion"). The scene is rendered with a
+    // normal perspective; here every pixel of the screen looks up where its light would
+    // have come from. The corners stay where they are, so nothing is cut off.
+    float2 centered = uv * 2.0 - 1.0;
+    float aspect = float(scene.get_width()) / float(scene.get_height());
+    float2 q = centered * float2(aspect, 1.0) * rsqrt(aspect * aspect + 1.0);      // the corners are at distance 1
+    float r2 = dot(q, q);
+    float bend = (1.0 + post.lensDistortion * r2) / (1.0 + post.lensDistortion);
+    float2 lensUV = centered * bend * 0.5 + 0.5;
+
+    float3 hdr;
+    if (post.chromaticAberration > 0.0) {
+        // Glass bends red a little less than blue: the three colors come from slightly
+        // different places, more so toward the corners.
+        float spread = post.chromaticAberration * r2;
+        hdr.r = scene.sample(linearSampler, centered * bend * (1.0 - spread) * 0.5 + 0.5).r;
+        hdr.g = scene.sample(linearSampler, lensUV).g;
+        hdr.b = scene.sample(linearSampler, centered * bend * (1.0 + spread) * 0.5 + 0.5).b;
+    } else {
+        hdr = scene.sample(linearSampler, lensUV).rgb;
+    }
+    hdr += bloom.sample(linearSampler, lensUV).rgb * post.bloomIntensity;
     hdr *= post.exposure;
 
     float3 mapped;
@@ -94,6 +130,14 @@ fragment float4 fragment_tonemap(FullscreenOut in [[stage_in]],
 
     float2 fromCenter = in.uv - 0.5;
     mapped *= 1.0 - post.vignette * dot(fromCenter, fromCenter) * 2.0;
+
+    if (post.grain > 0.0 || post.interference > 0.0) {
+        float noise = videoNoise(in.position.xy, post.time) - 0.5;
+        // Static washes the colors out as well as covering them.
+        float gray = dot(mapped, float3(0.299, 0.587, 0.114));
+        mapped = mix(mapped, float3(gray), post.interference * 0.7);
+        mapped = saturate(mapped + noise * (post.grain + post.interference * 0.55));
+    }
     return float4(mapped, 1.0);
 }
 

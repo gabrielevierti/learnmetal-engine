@@ -8,7 +8,6 @@ Three chapters of the tutorials walk through this code: [A Game Engine](https://
 
 ![The marble on a stone bridge, gems ahead, a ramp to the right](Docs/marble.jpg)
 
-*This picture was made without a GPU: a test program ran the engine's own shaders on the CPU. See [What has been checked](#what-has-been-checked).*
 
 ## What is in it
 
@@ -20,11 +19,14 @@ Three chapters of the tutorials walk through this code: [A Game Engine](https://
 - Normal maps, cut-out materials (with holes in their shadows too), transparent materials sorted back to front
 - Automatic instancing, frustum culling, particles, debug lines
 - Screen-space ambient occlusion, bloom, tone mapping, fog
+- A sky with drifting clouds, which also lights the scene
+- A camera that looks filmed when you want it to: lens distortion, color fringes, grain, the tearing of a weak video link
 - Shaders compiled at startup and reloaded when you save a `.metal` file
 
 **2D**
 
-- A canvas for interfaces and 2D games: rectangles, lines, circles, images, and text that stays sharp at any size (signed distance field fonts)
+- A canvas for interfaces and 2D games: rectangles, rounded rectangles, lines, circles, rings, arcs, polygons, images, and text that stays sharp at any size (signed distance field fonts)
+- Smooth edges without multisampling, and clipping to a rectangle
 
 **Everything else a game needs**
 
@@ -33,13 +35,14 @@ Three chapters of the tutorials walk through this code: [A Game Engine](https://
 - Keyboard, mouse and gamepad, behind named actions ("jump", "moveX")
 - Sound: a software mixer with volume, pitch, pan and looping; sounds from files or synthesized from a few numbers
 - Assets: PNG and JPEG textures, OBJ models, fonts, audio files, loaded once and shared
+- Things made in code: boxes, spheres, cylinders, cones, terrain from a height function, textures from computed pixels, noise
 
 **Editor**
 
 - A scene editor built with the engine: a 3D view with a fly camera, click to select, handles to move, rotate and scale
 - Panels for the entity list, every component, materials and their textures, the sky and the effects
 - Scenes are saved as text files that read well in a diff; undo and redo; Play runs the physics and Stop puts everything back
-- The interface is the engine's own immediate-mode `Gui`, which games can use too
+- The interface is the engine's own immediate-mode `Gui`, which games can use too: panels that scroll, folding sections, number fields you drag, lists, pop-ups, tooltips, and icons drawn by code
 
 **Tools**
 
@@ -76,13 +79,41 @@ cmake --build build -j
 
 ## FPV, the drone game
 
-Fly a racing drone from its own camera: a two-lap race through eight gates against the clock, or free flight over the same field. Angle mode levels the drone for you; Acro is how FPV pilots really fly. It is the Swift engine's first program for iOS (the engine now builds for macOS and iOS; the C++ version stays on the Mac).
+![The view from the drone: a green gate ahead, flags, trees and hills, with battery, link and speed written over the picture](Docs/fpv.jpg)
+
+Fly a racing drone from its own camera: a two-lap race through eight gates against the clock, or free flight over a field with trees to round and an unfinished building to thread.
+
+The drone is simulated, not animated. It is a rigid body with four motors, and everything a pilot feels comes out of the physics:
+
+- **Motors and propellers.** Thrust grows with the square of motor speed, so a strong quad hovers on a quarter of its throttle. Motors take time to change speed. Thrust fades as the drone goes faster, which with drag sets the top speed.
+- **A flight controller.** Betaflight's "Actual" rates turn the sticks into rates of rotation; a PID loop per axis and a mixer with air mode turn those into four motor commands. Its gains are worked out from the airframe.
+- **Air.** Drag that depends on which side faces the wind, the cushion of air near the ground, the wobble of sinking through your own propwash, wind with gusts.
+- **A battery.** A lithium pack that sags under load and empties in minutes: full throttle pulls a hundred amperes and the voltage shows it.
+- **Crashes.** A light touch is a bounce. A hard one stops the motors and the drone tumbles; when it lies still it is turned over, and the motors start again once the throttle is down.
+- **A radio link.** It weakens with distance and behind obstacles. The picture tears before the link drops, and when it drops the motors stop.
+
+Two drones are built in: a 5-inch freestyle quad on six cells (650 g, about 130 km/h) and a 2-inch ducted whoop on two cells, 95 mm across, the size of a BETAFPV Cetus X (82 g, about 50 km/h). Angle mode levels the drone for you; Acro is how FPV pilots really fly.
+
+![Seen from behind: the drone, its shadow on the grass, and the first gate](Docs/fpv-chase.jpg)
 
 ```sh
-swift run FPV                  # on a Mac: W S throttle, A D yaw, arrows pitch and roll
+swift run FPV                  # Swift, on a Mac
+./build/fpv                    # C++
 ```
 
-For iPhone and iPad, see [iOS/README.md](iOS/README.md): `xcodegen generate`, open the project, press Run. Two thumbs on the screen, a game controller, or an RC radio that can act as a gamepad.
+| | Keyboard | Controller |
+|---|---|---|
+| Throttle (it stays where you leave it) | W S | Left stick, up and down |
+| Yaw | A D | Left stick, sideways |
+| Pitch and roll | Arrow keys | Right stick |
+| Start again | R | A |
+| Angle or Acro | M | X |
+| Onboard or chase view | C | Y |
+| Menu | Esc | B |
+
+`--race` and `--free` skip the menu, `--whoop` picks the small drone, `--acro` and `--chase` do what they say.
+
+**On iPhone and iPad** the game is the Swift version with two sticks on the screen: see [iOS/README.md](iOS/README.md). `xcodegen generate`, open the project, press Run.
 
 ## The editor
 
@@ -251,32 +282,21 @@ Assets/             fonts, textures, a model and a sample scene
 Swift/LMEngine/     the engine in Swift
 Swift/Marble/       the game in Swift
 Swift/Editor/       the editor in Swift
-Swift/FPVKit/       FPV, the drone game (flight model, track, controls, screens)
+Swift/FPVKit/       FPV, the drone game (flight model, track, world, controls, screens)
 Swift/FPV/          FPV as a Mac program
 iOS/                FPV as an iPhone and iPad app
-Swift/Tests/        unit tests (XCTest)
+Swift/Tests/        97 unit tests (XCTest)
 Cpp/engine/         the engine in C++
 Cpp/marble/         the game in C++
 Cpp/editor/         the editor in C++
-Cpp/tests/          unit tests
+Cpp/fpv/            FPV in C++ (keyboard and controller; the touch controls are in the Swift version)
+Cpp/tests/          the same 100 tests in C++
 Tools/              bake_font.py and make_assets.py
 ```
 
-## What has been checked
-
-This engine was written on a Linux machine, without a Mac, a GPU or a Swift compiler. Here is exactly what was and was not verified, so you know where to look first if something does not build.
-
-| | Checked | Not checked |
-|---|---|---|
-| **C++ engine and game** | 46 of the 47 C++ files compile for macOS on Apple silicon against Apple's real metal-cpp and simd headers (the few Core Foundation and Core Graphics types those headers mention came from small stand-in headers). The remaining file, `ThirdParty.cpp`, only pulls in the stb and miniaudio implementations and was compiled on Linux. 82 unit tests pass (80 run on Linux, the 2 for scene files on the stand-in described next). The whole engine, the game and the editor were then run against a software stand-in for Metal, written for this purpose, which executes the real shaders on the CPU: the autopilot finishes the course, and the stand-in's checks (reference counting, pass and pipeline formats, missing bindings, values that are not numbers) report nothing. The editor was driven there by scripted mouse and keyboard input: switching tabs, choosing from a list, dragging a handle, undo, play and stop, and saving a scene that reopens identical. | Never linked on a Mac. Never run on a real GPU. The Objective-C++ file that attaches the Metal layer to the window (`MetalLayerBridge.mm`, 24 lines) was not compiled at all. |
-| **Shaders** | Type-checked by compiling them as C++ against a stand-in for the Metal standard library, and executed on the CPU to produce the pictures in this file, the editor's included. | Never compiled by Apple's Metal compiler. |
-| **Swift engine and game** | A parser confirms the syntax is valid, and a script confirms that calls to the engine's own functions use labels that exist. It is a file-by-file port of the C++ code that was tested. | **Never compiled.** Expect compile errors in the Swift version the first time; the most likely places are `Platform/Window.swift`, `Audio/Audio.swift` and `Rendering/ImageDecoder.swift`, which talk to AppKit, AVFoundation and Core Graphics. The Swift editor, the FPV game with its iOS app, and the 86 Swift tests are in the same state. The flight model's math was checked numerically with an equivalent script (hover, the direction each stick moves the drone, recovery in angle mode), not by running the Swift. |
-
-The workflow in `.github/workflows/ci.yml` builds both versions on a Mac, runs the tests, lets the autopilot play the course, opens the sample scene in the editor, attaches the pictures, and builds the iPhone app for the simulator. The first push to GitHub is therefore the first real test.
-
 ## Not there yet
 
-In the editor: one selection at a time, no scripting, no drag and drop, and Ctrl where a Mac user expects Command. In the engine: stencil effects (outlines), a deferred path, shadows from point lights, parallax mapping, glTF and skinned animation, tessellation, ray tracing, mesh shaders, MetalFX, Metal 4, visionOS, iOS. The physics has no rotation from impacts and no joints.
+In the editor: one selection at a time, no scripting, no drag and drop, and Ctrl where a Mac user expects Command. In the engine: stencil effects (outlines), a deferred path, shadows from point lights, parallax mapping, glTF and skinned animation, tessellation, ray tracing, mesh shaders, MetalFX, Metal 4, visionOS. Only the Swift version runs on iOS. The physics has no rotation from impacts and no joints.
 
 ## Credits
 

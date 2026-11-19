@@ -170,7 +170,7 @@ void Engine::simulate(Game& game, double realDelta) {
     scene.updateTransforms();
     updateParticles(scene, time.delta);
 
-    canvas_.begin(screenSize());
+    canvas_.begin(screenSize(), window_ ? window_->contentScale() : float(config_.captureScale));
     game.draw(*this, canvas_);
     if (showsColliders) drawColliders();
     if (showsStatistics) drawStatistics();

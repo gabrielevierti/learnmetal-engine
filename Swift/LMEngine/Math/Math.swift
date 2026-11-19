@@ -61,6 +61,11 @@ public func damp(_ current: Vec3, _ target: Vec3, sharpness: Float, dt: Float) -
 }
 
 /// normalize() that returns `fallback` instead of NaN for a zero-length vector.
+public func safeNormalize(_ v: Vec2, fallback: Vec2) -> Vec2 {
+    let lengthSquared = simd_dot(v, v)
+    return lengthSquared > 1e-12 ? v / lengthSquared.squareRoot() : fallback
+}
+
 public func safeNormalize(_ v: Vec3, fallback: Vec3 = Vec3(0, 1, 0)) -> Vec3 {
     let lengthSquared = simd_length_squared(v)
     return lengthSquared > 1e-12 ? v / lengthSquared.squareRoot() : fallback
@@ -302,6 +307,45 @@ public func intersectPlane(_ ray: Ray, _ plane: Plane) -> Float? {
 }
 
 // MARK: - Random numbers
+
+// MARK: - Noise
+
+/// A repeatable random number in [0, 1) for a point of the integer grid. The same
+/// point and seed always give the same number, on every machine.
+public func hashNoise(_ x: Int, _ y: Int, seed: UInt32 = 0) -> Float {
+    var h = UInt32(truncatingIfNeeded: x) &* 0x8da6b343 &+ UInt32(truncatingIfNeeded: y) &* 0xd8163841 &+ seed &* 0xcb1ab31f
+    h ^= h >> 13
+    h = h &* 0x5bd1e995
+    h ^= h >> 15
+    return Float(h & 0xffffff) / Float(0x1000000)
+}
+
+/// Smooth noise in [0, 1): random values at the corners of a unit grid, blended in
+/// between. Looks like soft blobs about one unit wide.
+public func valueNoise(_ p: Vec2, seed: UInt32 = 0) -> Float {
+    let fx = p.x.rounded(.down), fy = p.y.rounded(.down)
+    let x = Int(fx), y = Int(fy)
+    var tx = p.x - fx, ty = p.y - fy
+    tx = tx * tx * (3 - 2 * tx)
+    ty = ty * ty * (3 - 2 * ty)
+    let top = lerp(hashNoise(x, y, seed: seed), hashNoise(x + 1, y, seed: seed), tx)
+    let bottom = lerp(hashNoise(x, y + 1, seed: seed), hashNoise(x + 1, y + 1, seed: seed), tx)
+    return lerp(top, bottom, ty)
+}
+
+/// Several layers of valueNoise, each twice as fine and half as strong as the one
+/// before, scaled back to [0, 1). The usual recipe for terrain, clouds and dirt.
+public func fractalNoise(_ point: Vec2, octaves: Int = 4, seed: UInt32 = 0) -> Float {
+    var p = point
+    var sum: Float = 0, strength: Float = 0.5, total: Float = 0
+    for i in 0..<max(octaves, 0) {
+        sum += strength * valueNoise(p, seed: seed &+ UInt32(i))
+        total += strength
+        p = p * 2
+        strength *= 0.5
+    }
+    return total > 0 ? sum / total : 0
+}
 
 /// A small, fast, seedable generator (PCG32). The same seed gives the same sequence on
 /// every machine and in both the C++ and the Swift engine, which keeps gameplay and

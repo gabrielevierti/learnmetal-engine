@@ -17,10 +17,6 @@ Without XcodeGen: create a new iOS App project (Storyboard interface, then delet
 
 ## Controls
 
-- **Thumbs.** Left stick: throttle (it stays where you leave it) and yaw. Right stick: pitch and roll.
-- **A controller.** Anything iOS accepts as a game controller: Xbox, PlayStation, MFi. Left stick throttle and yaw, right stick pitch and roll; A resets, X switches Angle and Acro, B goes to the menu.
-- **An RC radio.** iOS only lets apps see controllers through its GameController framework, so a radio must present itself as a gamepad. Radios with an "Xbox" or "gamepad" USB mode (the BETAFPV LiteRadio 2 SIM has one) are the ones to try, over USB-C or a Lightning adapter; a radio in plain "joystick" mode may not be seen at all. Set **Controller throttle: whole stick** in the menu, which is the default. This has not been tried with real hardware.
-
-## Not checked
-
-This app was written without a Mac: it has never been compiled or run. See the main README.
+- **Thumbs.** Left stick: throttle (it stays where you leave it) and yaw. Right stick: pitch and roll. The buttons along the top open the menu, start again, switch between the onboard and the chase view, and between Angle and Acro.
+- **A controller.** Anything iOS accepts as a game controller: Xbox, PlayStation, MFi. Left stick throttle and yaw, right stick pitch and roll; A starts again, X switches Angle and Acro, Y the view, B goes to the menu.
+- **An RC radio.** iOS only lets apps see controllers through its GameController framework, so a radio must present itself as a gamepad, not as a plain USB joystick. The BETAFPV LiteRadio 2 SE and LiteRadio 3 (the radio of the Cetus kits) gained an Xbox mode in their recent firmware: that is the mode to use, over USB-C or a Lightning adapter. Leave **Controller throttle: whole stick** on in the menu, which is the default: a radio's throttle stick does not spring back to the middle.

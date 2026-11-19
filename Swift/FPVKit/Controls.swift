@@ -21,7 +21,15 @@ final class Controls {
     private var leftTouch: Int?
     private var rightTouch: Int?
     private var keyboardThrottle: Float = 0
+    private var keys = Vec3(0, 0, 0)                // yaw, pitch, roll from the keyboard, eased
+    /// Draw the sticks even when a controller or the keyboard is flying: to see what the pilot is doing.
+    var showsSticks = false
+    /// On a phone the thumbs fly from the start; on a Mac, only once a touch has been seen.
+    #if os(iOS)
+    private(set) var hasSeenTouch = true
+    #else
     private(set) var hasSeenTouch = false
+    #endif
 
     let stickRadius: Float = 64
 
@@ -29,6 +37,7 @@ final class Controls {
         leftKnob = Vec2(0, -1)
         rightKnob = Vec2(0, 0)
         keyboardThrottle = 0
+        keys = Vec3(0, 0, 0)
     }
 
     /// The centers of the two sticks on screen, clear of the rounded corners.
@@ -85,37 +94,41 @@ final class Controls {
         // ---- a controller, if there is one, wins
         if input.isGamepadConnected {
             let leftY = input.axis(GamepadAxis.leftY)
-            return StickInput(throttle: throttleUsesFullStick ? (leftY + 1) * 0.5 : max(leftY, 0),
-                              yaw: input.axis(GamepadAxis.leftX),
-                              pitch: input.axis(GamepadAxis.rightY),
-                              roll: input.axis(GamepadAxis.rightX))
+            let sticks = StickInput(throttle: throttleUsesFullStick ? (leftY + 1) * 0.5 : max(leftY, 0),
+                                    yaw: input.axis(GamepadAxis.leftX),
+                                    pitch: input.axis(GamepadAxis.rightY),
+                                    roll: input.axis(GamepadAxis.rightX))
+            leftKnob = Vec2(sticks.yaw, sticks.throttle * 2 - 1)
+            rightKnob = Vec2(sticks.roll, sticks.pitch)
+            return sticks
         }
 
         // ---- the keyboard, on a Mac: W and S move the throttle, which stays put like a radio's
         if !hasSeenTouch {
-            if input.isDown(Key.w) { keyboardThrottle = min(keyboardThrottle + dt * 0.9, 1) }
-            if input.isDown(Key.s) { keyboardThrottle = max(keyboardThrottle - dt * 0.9, 0) }
+            if input.isDown(Key.w) { keyboardThrottle = min(keyboardThrottle + dt * 0.8, 1) }
+            if input.isDown(Key.s) { keyboardThrottle = max(keyboardThrottle - dt * 0.8, 0) }
             let yaw: Float = (input.isDown(Key.d) ? 1 : 0) - (input.isDown(Key.a) ? 1 : 0)
             let pitch: Float = (input.isDown(Key.up) ? 1 : 0) - (input.isDown(Key.down) ? 1 : 0)
             let roll: Float = (input.isDown(Key.right) ? 1 : 0) - (input.isDown(Key.left) ? 1 : 0)
-            leftKnob = Vec2(yaw, keyboardThrottle * 2 - 1)
-            rightKnob = Vec2(roll, pitch)
-            // Keys are all or nothing: tame them, or every tap is a full-rate flip.
-            return StickInput(throttle: keyboardThrottle, yaw: yaw * 0.7, pitch: pitch * 0.6, roll: roll * 0.6)
+            // Keys are all or nothing. Ease toward a part of the travel, or every tap is a full-rate flip.
+            keys = damp(keys, Vec3(yaw, pitch, roll) * 0.65, sharpness: 14, dt: dt)
+            leftKnob = Vec2(keys.x, keyboardThrottle * 2 - 1)
+            rightKnob = Vec2(keys.z, keys.y)
+            return StickInput(throttle: keyboardThrottle, yaw: keys.x, pitch: keys.y, roll: keys.z)
         }
 
         return StickInput(throttle: (leftKnob.y + 1) * 0.5, yaw: leftKnob.x, pitch: rightKnob.y, roll: rightKnob.x)
     }
 
-    /// Draws the two sticks. With a controller connected they are not shown: the real ones are in your hands.
+    /// Draws the two sticks where thumbs fly. With a controller or a keyboard they are
+    /// not shown (the real ones are in your hands), unless `showsSticks` asks for them.
     func draw(_ engine: Engine, _ canvas: Canvas) {
-        if engine.input.isGamepadConnected { return }
+        if !showsSticks && (engine.input.isGamepadConnected || !hasSeenTouch) { return }
         let centers = stickCenters(engine)
         for (center, position) in [(centers.left, leftKnob), (centers.right, rightKnob)] {
-            canvas.circle(center: center, radius: stickRadius + 6, Vec4(1, 1, 1, 0.10), segments: 40)
-            canvas.circle(center: center, radius: stickRadius, Vec4(0, 0, 0, 0.22), segments: 40)
-            let knobCenter = center + Vec2(position.x, -position.y) * stickRadius
-            canvas.circle(center: knobCenter, radius: 26, Vec4(1, 1, 1, 0.55), segments: 28)
+            canvas.circle(center: center, radius: stickRadius, Vec4(0, 0, 0, 0.22))
+            canvas.ring(center: center, radius: stickRadius, thickness: 1.5, Vec4(1, 1, 1, 0.35))
+            canvas.circle(center: center + Vec2(position.x, -position.y) * stickRadius, radius: 24, Vec4(1, 1, 1, 0.6))
         }
     }
 }

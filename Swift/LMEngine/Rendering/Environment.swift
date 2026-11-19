@@ -94,6 +94,8 @@ final class Environment {
             && frame.sunDirection == captured.sunDirection && frame.sunColor == captured.sunColor
             && frame.skyZenithColor == captured.skyZenithColor && frame.skyHorizonColor == captured.skyHorizonColor
             && frame.skyGroundColor == captured.skyGroundColor && frame.skyIntensity == captured.skyIntensity
+            // Clouds drift every frame: only a change in how many there are is worth a new capture.
+            && frame.cloudCoverage == captured.cloudCoverage && frame.cloudScale == captured.cloudScale
         if isSame || !shaders.isValid { return false }
 
         var capture = CaptureUniforms()

@@ -20,7 +20,7 @@ final class RenderingMathTests: XCTestCase {
         // for these types (a float3 is 16 bytes, aligned to 16). The C++ tests check the
         // same numbers. If a field is added to ShaderTypes.h, update them on purpose.
         XCTAssertEqual(MemoryLayout<PassUniforms>.stride, 368)
-        XCTAssertEqual(MemoryLayout<FrameUniforms>.stride, 496)
+        XCTAssertEqual(MemoryLayout<FrameUniforms>.stride, 512)
         XCTAssertEqual(MemoryLayout<InstanceData>.stride, 144)
         XCTAssertEqual(MemoryLayout<LightData>.stride, 96)
         XCTAssertEqual(MemoryLayout<MaterialUniforms>.stride, 64)
@@ -219,13 +219,78 @@ final class RenderingMathTests: XCTestCase {
 
         canvas.circle(center: Vec2(50, 50), radius: 10, rgb(0xffffff), segments: 8)
         XCTAssertEqual(canvas.batches.count, 1)
-        XCTAssertEqual(canvas.vertices.count, 12 + 24)
+        XCTAssertEqual(canvas.vertices.count, 12 + 66)      // the circle: six triangles inside, and two per side for the soft edge
         XCTAssertEqual(canvas.measureText("AB", size: 40).x, 0, accuracy: 1e-6)      // no font set yet
         canvas.setFont(font, atlas: nil)
         XCTAssertEqual(canvas.measureText("AB", size: 40).x, 46, accuracy: 1e-4)
 
         canvas.begin(size: Vec2(800, 600))
         XCTAssertTrue(canvas.vertices.isEmpty && canvas.batches.isEmpty)
+    }
+
+    func testCanvasShapesFadeOutOverOnePixel() {
+        let canvas = Canvas()
+        canvas.begin(size: Vec2(800, 600), pixelsPerPoint: 2)       // a Retina display: one pixel is half a point
+        XCTAssertEqual(canvas.pixelSize, 0.5, accuracy: 1e-6)
+        canvas.roundedRect(Vec2(100, 100), Vec2(200, 80), radius: 12, Vec4(1, 0, 0, 0.8))
+        XCTAssertEqual(canvas.batches.count, 1)
+        XCTAssertEqual(canvas.vertices.count % 3, 0)
+        var solid = 0, clear = 0
+        for v in canvas.vertices {
+            // Nothing is drawn more than half a pixel outside the rectangle asked for.
+            XCTAssertTrue(v.position.x >= 100 - 0.26 && v.position.x <= 300 + 0.26)
+            XCTAssertTrue(v.position.y >= 100 - 0.26 && v.position.y <= 180 + 0.26)
+            if v.color.w == 0 {
+                clear += 1
+            } else {
+                solid += 1
+                XCTAssertEqual(v.color.w, 0.8, accuracy: 1e-6)
+            }
+        }
+        XCTAssertTrue(solid > 0 && clear > 0)
+
+        // A circle touches its radius on all four sides.
+        canvas.begin(size: Vec2(800, 600))
+        canvas.circle(center: Vec2(50, 50), radius: 20, Vec4(1, 1, 1, 1))
+        let xs = canvas.vertices.map { $0.position.x }
+        XCTAssertEqual(xs.min() ?? 0, 29.5, accuracy: 0.2)
+        XCTAssertEqual(xs.max() ?? 0, 70.5, accuracy: 0.2)
+    }
+
+    func testALineThinnerThanAPixelIsDrawnFainter() {
+        let canvas = Canvas()
+        canvas.begin(size: Vec2(800, 600))
+        canvas.line(from: Vec2(10, 10), to: Vec2(110, 10), thickness: 0.25, Vec4(1, 1, 1, 1))
+        XCTAssertFalse(canvas.vertices.isEmpty)
+        let strongest = canvas.vertices.map { $0.color.w }.max() ?? 0
+        let ys = canvas.vertices.map { $0.position.y }
+        XCTAssertEqual(strongest, 0.25, accuracy: 1e-5)
+        XCTAssertEqual((ys.max() ?? 0) - (ys.min() ?? 0), 2, accuracy: 1e-4)       // one pixel, fading on both sides
+    }
+
+    func testCanvasClipsNestAndSplitDrawCalls() {
+        let canvas = Canvas()
+        let white = Vec4(1, 1, 1, 1)
+        canvas.begin(size: Vec2(800, 600))
+        canvas.rect(Vec2(0, 0), Vec2(10, 10), white)
+        canvas.pushClip(Vec2(100, 100), Vec2(200, 200))
+        canvas.rect(Vec2(0, 0), Vec2(10, 10), white)
+        canvas.pushClip(Vec2(250, 50), Vec2(200, 100))          // sticks out of the first one
+        canvas.rect(Vec2(0, 0), Vec2(10, 10), white)
+        canvas.pushClip(Vec2(0, 0), Vec2(50, 50))               // entirely outside: nothing can be drawn
+        canvas.rect(Vec2(0, 0), Vec2(10, 10), white)
+        canvas.circle(center: Vec2(5, 5), radius: 4, white)
+        canvas.popClip()
+        canvas.popClip()
+        canvas.popClip()
+        canvas.rect(Vec2(0, 0), Vec2(10, 10), white)
+        canvas.popClip()                                        // one too many: harmless
+
+        XCTAssertEqual(canvas.batches.count, 4)
+        XCTAssertTrue(!canvas.batches[0].isClipped && canvas.batches[1].isClipped && !canvas.batches[3].isClipped)
+        XCTAssertEqual(canvas.batches[2].clipMin, Vec2(250, 100))
+        XCTAssertEqual(canvas.batches[2].clipMax, Vec2(300, 150))
+        XCTAssertEqual(canvas.vertices.count, 4 * 6)
     }
 
     func testDebugDrawBuildsLineLists() {

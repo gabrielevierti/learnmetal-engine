@@ -7,6 +7,10 @@
 //
 // Coordinates are in points with the origin at the top left, like the window system's.
 // Colors are sRGB with straight alpha, the values a color picker shows.
+//
+// Edges are smoothed without multisampling: every shape that is not an upright rectangle
+// gets a border one pixel wide that fades from its color to transparent. The same
+// triangles and the same shader do everything; only the vertices know about it.
 #pragma once
 
 #include "Assets/Font.hpp"
@@ -31,10 +35,32 @@ public:
     /// The drawable area, in points.
     Vec2 size() const { return size_; }
 
+    /// One screen pixel, in points: 1 on a plain screen, 0.5 on a Retina display.
+    float pixelSize() const { return pixelSize_; }
+
     void rect(Vec2 position, Vec2 size, Vec4 color);
     void rectOutline(Vec2 position, Vec2 size, float thickness, Vec4 color);
     void line(Vec2 from, Vec2 to, float thickness, Vec4 color);
-    void circle(Vec2 center, float radius, Vec4 color, int segments = 32);
+    /// A filled circle. With `segments` 0 the canvas chooses enough of them for the radius.
+    void circle(Vec2 center, float radius, Vec4 color, int segments = 0);
+
+    // ---- more shapes, all with smooth edges
+    void roundedRect(Vec2 position, Vec2 size, float radius, Vec4 color);
+    void roundedRectOutline(Vec2 position, Vec2 size, float radius, float thickness, Vec4 color);
+    /// The outline of a circle, drawn inside `radius`.
+    void ring(Vec2 center, float radius, float thickness, Vec4 color);
+    /// Part of a ring. Angles are in radians, clockwise on screen, 0 pointing right.
+    void arc(Vec2 center, float radius, float fromAngle, float toAngle, float thickness, Vec4 color);
+    void triangle(Vec2 a, Vec2 b, Vec2 c, Vec4 color);
+    /// Any convex shape, from its corners in order (either direction).
+    void polygon(const std::vector<Vec2>& points, Vec4 color);
+    /// A line through several points. `isClosed` joins the last point to the first.
+    void polyline(const std::vector<Vec2>& points, float thickness, Vec4 color, bool isClosed = false);
+
+    // ---- clipping: until popClip, nothing is drawn outside the rectangle. Clips nest:
+    // a clip inside another one is cut to it.
+    void pushClip(Vec2 position, Vec2 size);
+    void popClip();
 
     /// Draws a texture, or part of one: `uvMin` and `uvMax` select a region, which is
     /// how sprite sheets work.
@@ -53,9 +79,12 @@ public:
         bool isText = false;                // text samples a distance field instead of colors
         uint32_t firstVertex = 0;
         uint32_t vertexCount = 0;
+        bool isClipped = false;             // draw only inside clipMin ... clipMax (in points)
+        Vec2 clipMin{0, 0}, clipMax{0, 0};
     };
 
-    void begin(Vec2 sizeInPoints);
+    /// `pixelsPerPoint` is 2 on a Retina display: the canvas needs it to make edges one pixel soft.
+    void begin(Vec2 sizeInPoints, float pixelsPerPoint = 1.0f);
     void setFont(const FontMetrics* metrics, const Texture* atlas);
     const std::vector<gpu::CanvasVertex>& vertices() const { return vertices_; }
     const std::vector<Batch>& batches() const { return batches_; }
@@ -65,10 +94,22 @@ public:
 private:
     void quad(Vec2 a, Vec2 b, Vec2 c, Vec2 d, Vec2 uvA, Vec2 uvB, Vec2 uvC, Vec2 uvD, Vec4 color,
               const Texture* texture, bool isText);
-    void triangle(Vec2 a, Vec2 b, Vec2 c, Vec4 color);
+    void vertex(Vec2 position, Vec4 color);
+    void fillConvex(const Vec2* points, int count, Vec4 color);
+    void strokePath(const Vec2* points, int count, float thickness, Vec4 color, bool isClosed);
+    void roundedRectPath(Vec2 position, Vec2 size, float radius);
+    void arcPath(Vec2 center, float radius, float fromAngle, float toAngle, int segments);
+    int segmentsFor(float radius) const;
     Batch& batchFor(const Texture* texture, bool isText);
 
+    struct Clip {
+        Vec2 min{0, 0}, max{0, 0};
+    };
     Vec2 size_{0, 0};
+    float pixelSize_ = 1.0f;
+    std::vector<Clip> clips_;
+    bool isClipEmpty_ = false;              // the current clip has no area: nothing can be drawn
+    std::vector<Vec2> path_, inner_, outer_;    // scratch space, kept to avoid allocating per shape
     const FontMetrics* font_ = nullptr;
     const Texture* fontAtlas_ = nullptr;
     std::vector<gpu::CanvasVertex> vertices_;

@@ -6,6 +6,36 @@
 
 #include "Common.metal"
 
+// ---------------------------------------------------------------- clouds
+
+// A repeatable random number for each cell of a grid.
+static float cloudHash(float2 p) {
+    p = fract(p * float2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
+}
+
+// Random values at the corners of each cell, blended smoothly in between.
+static float cloudValueNoise(float2 p) {
+    float2 cell = floor(p), f = fract(p);
+    float2 u = f * f * (3.0 - 2.0 * f);
+    float top = mix(cloudHash(cell), cloudHash(cell + float2(1.0, 0.0)), u.x);
+    float bottom = mix(cloudHash(cell + float2(0.0, 1.0)), cloudHash(cell + float2(1.0, 1.0)), u.x);
+    return mix(top, bottom, u.y);
+}
+
+// Five layers of that noise, each twice as fine and half as strong as the one before:
+// large shapes with ragged edges, which is what a cloud is.
+static float cloudNoise(float2 p) {
+    float sum = 0.0, strength = 0.5;
+    for (int i = 0; i < 5; i++) {
+        sum += strength * cloudValueNoise(p);
+        p = p * 2.03 + float2(17.0, 9.0);
+        strength *= 0.5;
+    }
+    return sum;
+}
+
 static float3 skyRadiance(float3 direction, constant FrameUniforms &frame, bool withSunDisk) {
     float3 d = normalize(direction);
     float3 toSun = -frame.sunDirection;
@@ -20,9 +50,27 @@ static float3 skyRadiance(float3 direction, constant FrameUniforms &frame, bool 
     float glow = 0.35 * pow(towardSun, 64.0) + 0.08 * pow(towardSun, 6.0);
     color += frame.sunColor * glow * smoothstep(-0.1, 0.05, d.y);
 
+    // Clouds: a flat layer overhead. Dividing by the height of the direction is the
+    // perspective of looking along a ceiling: clouds get smaller and closer together
+    // toward the horizon.
+    float cover = 0.0;
+    if (frame.cloudCoverage > 0.0 && d.y > 0.0) {
+        float2 p = d.xz / (d.y + 0.1) * frame.cloudScale + frame.cloudOffset;
+        float density = cloudNoise(p);
+        float threshold = 0.78 - 0.5 * frame.cloudCoverage;
+        cover = smoothstep(threshold, threshold + 0.2, density) * smoothstep(0.0, 0.1, d.y);
+        // A second look a little toward the sun: where the cloud is thinner there than
+        // here, this side is lit; where it is thicker, this side is in its shade.
+        float2 sunward = toSun.xz / max(length(toSun.xz), 0.001) * 0.3;
+        float light = saturate(0.62 + (density - cloudNoise(p + sunward)) * 3.0);
+        float3 shade = frame.skyHorizonColor * 0.9 + frame.skyZenithColor * 0.35;
+        float3 lit = frame.sunColor * 0.3 + frame.skyHorizonColor * 0.5;
+        color = mix(color, mix(shade, lit, light), cover);
+    }
+
     if (withSunDisk) {
         float disk = smoothstep(frame.sunDiskSize, frame.sunDiskSize + 0.00008, dot(d, toSun));
-        color += frame.sunColor * frame.sunDiskIntensity * disk;
+        color += frame.sunColor * frame.sunDiskIntensity * disk * (1.0 - cover);
     }
     return color * frame.skyIntensity;
 }

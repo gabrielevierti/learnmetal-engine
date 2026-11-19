@@ -40,6 +40,9 @@ struct SkySettings {
     float intensity = 1.0f;
     float sunDiskIntensity = 30.0f;             // how much brighter than the sunlight the disk itself looks
     float sunAngularRadius = radians(1.2f);
+    float cloudCoverage = 0.0f;                 // 0 a clear sky, 1 overcast
+    float cloudScale = 1.0f;                    // larger numbers make smaller clouds
+    Vec2 cloudSpeed{0.012f, 0.004f};            // how fast the wind carries them
 };
 
 struct RenderSettings {
@@ -70,6 +73,12 @@ struct RenderSettings {
     float exposure = 1.0f;
     int toneMapper = 0;                         // 0 ACES, 1 Reinhard, 2 none
     float vignette = 0.25f;
+
+    // The camera's lens and video signal: what makes a picture look filmed, not computed.
+    float lensDistortion = 0.0f;                // 0 none; 0.3 an action camera; 0.6 a fisheye
+    float chromaticAberration = 0.0f;           // colors separate toward the corners; 0.01 is plenty
+    float filmGrain = 0.0f;                     // fine noise; 0.03 is visible
+    float interference = 0.0f;                  // 0 clean, 1 an analog video link about to drop
 };
 
 struct RenderStats {
@@ -153,7 +162,7 @@ private:
                      MTL::PixelFormat colorFormat, int sampleCount);
     void drawParticles(MTL::RenderCommandEncoder* encoder, Scene& scene, const View& view);
     void drawDebugLines(MTL::RenderCommandEncoder* encoder);
-    void drawCanvas(MTL::RenderCommandEncoder* encoder, const Canvas& canvas, MTL::PixelFormat format);
+    void drawCanvas(MTL::RenderCommandEncoder* encoder, const Canvas& canvas, MTL::Texture* target);
     void renderShadows(MTL::CommandBuffer* commandBuffer, const std::vector<DrawItem>& items, const Cascades& cascades);
     void renderOcclusion(MTL::CommandBuffer* commandBuffer, const std::vector<Batch>& opaque, const View& view,
                          const FrameAllocator::Allocation& passUniforms);
@@ -178,6 +187,7 @@ private:
     FrameAllocator allocators_[kFramesInFlight];
     int frameIndex_ = 0;
     uint64_t frameNumber_ = 0;
+    double time_ = 0;                               // of the frame being drawn
     dispatch_semaphore_t frameSemaphore_;
 
     std::shared_ptr<Texture> white_, flatNormal_;

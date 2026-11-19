@@ -334,6 +334,11 @@ extension Renderer {
         uniforms.bloomIntensity = hasBloom ? settings.bloomIntensity : 0
         uniforms.vignette = settings.vignette
         uniforms.toneMapper = UInt32(settings.toneMapper)
+        uniforms.lensDistortion = settings.lensDistortion
+        uniforms.chromaticAberration = settings.chromaticAberration
+        uniforms.grain = settings.filmGrain
+        uniforms.interference = settings.interference
+        uniforms.time = Float(frameTime)
 
         let pass = MTLRenderPassDescriptor()
         pass.colorAttachments[0].texture = target.texture
@@ -360,11 +365,11 @@ extension Renderer {
         }
 
         // The 2D canvas goes on top, after tone mapping: interface colors must not be tone mapped.
-        drawCanvas(encoder, canvas: canvas, format: target.texture.pixelFormat)
+        drawCanvas(encoder, canvas: canvas, target: target.texture)
         encoder.endEncoding()
     }
 
-    func drawCanvas(_ encoder: MTLRenderCommandEncoder, canvas: Canvas, format: MTLPixelFormat) {
+    func drawCanvas(_ encoder: MTLRenderCommandEncoder, canvas: Canvas, target: MTLTexture) {
         let vertices = canvas.vertices
         let size = canvas.size
         if vertices.isEmpty || size.x <= 0 || size.y <= 0 { return }
@@ -379,11 +384,26 @@ extension Renderer {
         encoder.setFragmentBytes(&uniforms, length: MemoryLayout<CanvasUniforms>.stride, index: BufferIndex.pass)
         encoder.setFragmentSamplerState(device.linearClampSampler, index: 0)
 
+        // Clips are given in points; the scissor rectangle that enforces them is in pixels and
+        // must stay inside the target, or Metal stops the program.
+        let width = target.width, height = target.height
+        let pixelsPerPoint = Vec2(Float(width) / size.x, Float(height) / size.y)
+
         for batch in canvas.batches where batch.vertexCount > 0 {
+            var scissor = MTLScissorRect(x: 0, y: 0, width: width, height: height)
+            if batch.isClipped {
+                let x0 = min(max(Int((batch.clipMin.x * pixelsPerPoint.x).rounded()), 0), width)
+                let y0 = min(max(Int((batch.clipMin.y * pixelsPerPoint.y).rounded()), 0), height)
+                let x1 = min(max(Int((batch.clipMax.x * pixelsPerPoint.x).rounded()), 0), width)
+                let y1 = min(max(Int((batch.clipMax.y * pixelsPerPoint.y).rounded()), 0), height)
+                if x1 <= x0 || y1 <= y0 { continue }
+                scissor = MTLScissorRect(x: x0, y: y0, width: x1 - x0, height: y1 - y0)
+            }
+            encoder.setScissorRect(scissor)
             var description = PipelineDescription()
             description.vertexFunction = "vertex_canvas"
             description.fragmentFunction = batch.isText ? "fragment_canvas_text" : "fragment_canvas"
-            description.colorFormat = format
+            description.colorFormat = target.pixelFormat
             description.blend = .alphaBlend
             guard let pipeline = shaders.pipeline(description) else { continue }
             encoder.setRenderPipelineState(pipeline)

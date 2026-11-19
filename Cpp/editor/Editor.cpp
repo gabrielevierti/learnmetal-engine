@@ -9,8 +9,9 @@
 using namespace lm;
 
 namespace {
-const float kToolbarHeight = 64;
-const float kLeftWidth = 250;
+const float kToolbarHeight = 44;
+const float kStatusHeight = 26;
+const float kLeftWidth = 260;
 const float kRightWidth = 320;
 const size_t kUndoLevels = 100;
 }
@@ -137,6 +138,7 @@ void Editor::newScene(Engine& engine) {
     selected_ = cube;
     engine.scene.updateTransforms();
     current_ = writeScene(engine.scene, materials_, engine.renderer().settings);
+    saved_ = current_;
     undo_.clear();
     redo_.clear();
     say("New scene");
@@ -160,6 +162,7 @@ bool Editor::openScene(Engine& engine, const std::string& name) {
     engine.renderer().settings = RenderSettings{};
     restore(engine, text.str());
     current_ = writeScene(engine.scene, materials_, engine.renderer().settings);
+    saved_ = current_;
     undo_.clear();
     redo_.clear();
     say("Opened " + name);
@@ -170,6 +173,7 @@ bool Editor::saveScene(Engine& engine) {
     if (isPlaying_) return false;
     std::string path = engine.assets().path("Scenes/" + sceneName + ".scene");
     bool saved = saveSceneFile(path, engine.scene, materials_, engine.renderer().settings);
+    if (saved) saved_ = writeScene(engine.scene, materials_, engine.renderer().settings);
     say(saved ? "Saved Scenes/" + sceneName + ".scene" : "Could not save " + sceneName);
     refreshLists(engine);
     return saved;
@@ -428,10 +432,11 @@ void Editor::draw(Engine& engine, Canvas& canvas) {
     handleShortcuts(engine);
 
     if (isPlaying_) {
-        // While playing the editor steps aside: one small panel to stop.
-        gui_.beginPanel("Playing", Vec2{screen.x * 0.5f - 90, 8}, Vec2{180, 64});
-        if (gui_.button("Stop (F5)")) setPlaying(engine, false);
-        gui_.endPanel();
+        // While playing the editor steps aside: one small card to stop.
+        Vec2 card{screen.x * 0.5f - 70, 10};
+        gui_.card(card, Vec2{140, 40});
+        if (gui_.iconButton(Gui::Icon::Stop, card + Vec2{5, 5}, Vec2{30, 30}, "Stop (F5)", true)) setPlaying(engine, false);
+        canvas.text("Playing", card + Vec2{44, 13}, gui_.style.fontSize, gui_.style.text);
         gui_.end();
         return;
     }
@@ -439,13 +444,15 @@ void Editor::draw(Engine& engine, Canvas& canvas) {
     updateCamera(engine, engine.time.unscaledDelta);
     drawViewport(engine, canvas);           // under the panels
 
-    drawToolbar(engine, screen);
-    float leftHeight = screen.y - kToolbarHeight;
+    drawToolbar(engine, canvas, screen, kToolbarHeight);
+    drawStatusBar(engine, canvas, screen, kStatusHeight);
+    drawTools(Vec2{kLeftWidth + 12, kToolbarHeight + 12});
+    float leftHeight = screen.y - kToolbarHeight - kStatusHeight;
     float sceneHeight = std::floor(leftHeight * 0.58f);
     drawScenePanel(engine, Vec2{0, kToolbarHeight}, Vec2{kLeftWidth, sceneHeight});
     drawAssetsPanel(engine, Vec2{0, kToolbarHeight + sceneHeight}, Vec2{kLeftWidth, leftHeight - sceneHeight});
 
-    static const char* const titles[] = {"Inspector", "Materials", "Scene settings"};
+    static const char* const titles[] = {"#Inspector", "#Materials", "#Scene settings"};
     gui_.beginPanel(titles[rightTab_], Vec2{screen.x - kRightWidth, kToolbarHeight}, Vec2{kRightWidth, leftHeight});
     gui_.tabs({"Inspector", "Materials", "Scene"}, rightTab_);
     gui_.separator();
@@ -457,6 +464,7 @@ void Editor::draw(Engine& engine, Canvas& canvas) {
     gui_.end();
     if (gui_.changed()) touched_ = true;
     recordUndo(engine);
+    hasUnsavedChanges_ = current_ != saved_;
     // What was created or moved in this frame is drawn in this frame: bring the world
     // matrices up to date again.
     engine.scene.updateTransforms();

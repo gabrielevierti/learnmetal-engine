@@ -12,8 +12,9 @@ import Foundation
 import LMEngine
 import simd
 
-let toolbarHeight: Float = 64
-private let leftWidth: Float = 250
+let toolbarHeight: Float = 44
+private let statusHeight: Float = 26
+private let leftWidth: Float = 260
 private let rightWidth: Float = 320
 private let undoLevels = 100
 
@@ -55,6 +56,8 @@ final class Editor: Game {
     private var undoStack: [String] = []
     private var redoStack: [String] = []
     private var current = ""
+    private var saved = ""                  // the scene as text, when it was opened or last saved
+    var hasUnsavedChanges = false           // the scene differs from that
     var touched = false
 
     private var beforePlay = ""
@@ -168,6 +171,7 @@ final class Editor: Game {
         selected = cube
         scene.updateTransforms()
         current = writeScene(scene, materials: materials, settings: engine.renderer.settings)
+        saved = current
         undoStack.removeAll()
         redoStack.removeAll()
         say("New scene")
@@ -190,6 +194,7 @@ final class Editor: Game {
         engine.renderer.settings = RenderSettings()
         restore(engine, text)
         current = writeScene(engine.scene, materials: materials, settings: engine.renderer.settings)
+        saved = current
         undoStack.removeAll()
         redoStack.removeAll()
         say("Opened \(name)")
@@ -200,10 +205,11 @@ final class Editor: Game {
     func saveScene(_ engine: Engine) -> Bool {
         if isPlaying { return false }
         let path = engine.assets.path("Scenes/\(sceneName).scene")
-        let saved = saveSceneFile(path, engine.scene, materials: materials, settings: engine.renderer.settings)
-        say(saved ? "Saved Scenes/\(sceneName).scene" : "Could not save \(sceneName)")
+        let wasSaved = saveSceneFile(path, engine.scene, materials: materials, settings: engine.renderer.settings)
+        if wasSaved { saved = writeScene(engine.scene, materials: materials, settings: engine.renderer.settings) }
+        say(wasSaved ? "Saved Scenes/\(sceneName).scene" : "Could not save \(sceneName)")
         refreshLists(engine)
-        return saved
+        return wasSaved
     }
 
     // MARK: - Editing
@@ -437,10 +443,13 @@ final class Editor: Game {
         handleShortcuts(engine)
 
         if isPlaying {
-            // While playing the editor steps aside: one small panel to stop.
-            gui.beginPanel("Playing", position: Vec2(screen.x * 0.5 - 90, 8), size: Vec2(180, 64))
-            if gui.button("Stop (F5)") { setPlaying(engine, false) }
-            gui.endPanel()
+            // While playing the editor steps aside: one small card to stop.
+            let card = Vec2(screen.x * 0.5 - 70, 10)
+            gui.card(position: card, size: Vec2(140, 40))
+            if gui.iconButton(.stop, position: card + Vec2(5, 5), size: Vec2(30, 30), tooltip: "Stop (F5)", isSelected: true) {
+                setPlaying(engine, false)
+            }
+            canvas.text("Playing", card + Vec2(44, 13), size: gui.style.fontSize, gui.style.text)
             gui.end()
             return
         }
@@ -448,13 +457,15 @@ final class Editor: Game {
         updateCamera(engine, dt: engine.time.unscaledDelta)
         drawViewport(engine, canvas)            // under the panels
 
-        drawToolbar(engine, screen)
-        let leftHeight = screen.y - toolbarHeight
+        drawToolbar(engine, canvas, screen)
+        drawStatusBar(engine, canvas, screen, height: statusHeight)
+        drawTools(position: Vec2(leftWidth + 12, toolbarHeight + 12))
+        let leftHeight = screen.y - toolbarHeight - statusHeight
         let sceneHeight = (leftHeight * 0.58).rounded(.down)
         drawScenePanel(engine, position: Vec2(0, toolbarHeight), size: Vec2(leftWidth, sceneHeight))
         drawAssetsPanel(engine, position: Vec2(0, toolbarHeight + sceneHeight), size: Vec2(leftWidth, leftHeight - sceneHeight))
 
-        let titles = ["Inspector", "Materials", "Scene settings"]
+        let titles = ["#Inspector", "#Materials", "#Scene settings"]
         gui.beginPanel(titles[rightTab], position: Vec2(screen.x - rightWidth, toolbarHeight), size: Vec2(rightWidth, leftHeight))
         gui.tabs(["Inspector", "Materials", "Scene"], &rightTab)
         gui.separator()
@@ -468,6 +479,7 @@ final class Editor: Game {
         gui.end()
         if gui.changed { touched = true }
         recordUndo(engine)
+        hasUnsavedChanges = current != saved
         // What was created or moved in this frame is drawn in this frame: bring the world
         // matrices up to date again.
         engine.scene.updateTransforms()

@@ -143,3 +143,27 @@ TEST(euler_angles_come_back_out_of_a_rotation) {
     Quat again = eulerAngles(angles.x, angles.y, angles.z);
     CHECK_NEAR(std::abs(simd::dot(up.vector, again.vector)), 1, 1e-4);
 }
+
+TEST(noise_is_repeatable_smooth_and_stays_in_range) {
+    CHECK(hashNoise(3, -7, 1) == hashNoise(3, -7, 1));
+    CHECK(hashNoise(3, -7, 1) != hashNoise(3, -7, 2));
+    CHECK(hashNoise(3, -7, 1) != hashNoise(4, -7, 1));
+    float lowest = 1, highest = 0, sum = 0;
+    int count = 0;
+    for (float y = -6; y < 6; y += 0.173f) {
+        for (float x = -6; x < 6; x += 0.191f) {
+            float n = fractalNoise(Vec2{x, y}, 4, 9);
+            CHECK(n >= 0 && n < 1);
+            lowest = std::min(lowest, n);
+            highest = std::max(highest, n);
+            sum += n;
+            count++;
+            // Smooth: a small step changes the value a little.
+            CHECK(std::abs(valueNoise(Vec2{x + 0.01f, y}) - valueNoise(Vec2{x, y})) < 0.03f);
+        }
+    }
+    CHECK(lowest < 0.3f && highest > 0.7f);                 // it uses its range
+    CHECK_NEAR(sum / float(count), 0.5f, 0.05f);
+    // At the grid points it is exactly the hash.
+    CHECK_NEAR(valueNoise(Vec2{2, 5}, 3), hashNoise(2, 5, 3), 1e-6);
+}

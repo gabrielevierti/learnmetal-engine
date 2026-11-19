@@ -64,7 +64,9 @@ private:
     bool updateGizmo(lm::Engine& engine, lm::Canvas& canvas);
 
     // EditorPanels.cpp
-    void drawToolbar(lm::Engine& engine, lm::Vec2 screen);
+    void drawToolbar(lm::Engine& engine, lm::Canvas& canvas, lm::Vec2 screen, float height);
+    void drawTools(lm::Vec2 position);
+    void drawStatusBar(lm::Engine& engine, lm::Canvas& canvas, lm::Vec2 screen, float height);
     void drawScenePanel(lm::Engine& engine, lm::Vec2 position, lm::Vec2 size);
     void drawAssetsPanel(lm::Engine& engine, lm::Vec2 position, lm::Vec2 size);
     void drawInspector(lm::Engine& engine);
@@ -96,6 +98,8 @@ private:
     std::vector<std::string> undo_, redo_;
     std::string current_;
     bool touched_ = false;
+    bool hasUnsavedChanges_ = false;        // the scene differs from what was opened or last saved
+    std::string saved_;                     // the scene as text, at that moment
 
     bool isPlaying_ = false;
     std::string beforePlay_;

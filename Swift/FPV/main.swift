@@ -4,7 +4,7 @@
 //
 // W / S          throttle up and down (it stays where you leave it, like a radio's)
 // A / D          yaw            arrows   pitch and roll
-// R reset        M angle / acro          Esc menu          Enter starts a race
+// R start again  M angle / acro   C onboard / chase   Esc menu   Enter starts a race
 // A controller works too: left stick throttle and yaw, right stick pitch and roll.
 
 import Foundation

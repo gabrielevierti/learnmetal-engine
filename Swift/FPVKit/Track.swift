@@ -13,7 +13,7 @@ public struct Gate {
     public var width: Float
     public var height: Float
 
-    public init(center: Vec3, yawDegrees: Float, width: Float = 4, height: Float = 3) {
+    public init(center: Vec3, yawDegrees: Float, width: Float = 3.2, height: Float = 2.4) {
         self.center = center
         yaw = radians(yawDegrees)
         self.width = width
@@ -88,7 +88,7 @@ public struct Race {
         return true
     }
 
-    /// The gate to respawn in front of after a crash: the last one that was passed.
+    /// The last gate that was passed.
     public var lastGate: Int { (nextGate + gateCount - 1) % gateCount }
 }
 
@@ -114,12 +114,12 @@ public func formatTime(_ seconds: Float) -> String {
 
 /// The course: a loop of gates around a field, with climbs, a dive and a hairpin.
 public let courseGates: [Gate] = [
-    Gate(center: Vec3(0, 2.0, -18), yawDegrees: 0),
-    Gate(center: Vec3(-6, 3.0, -42), yawDegrees: 25),
-    Gate(center: Vec3(-26, 5.5, -58), yawDegrees: 75),
-    Gate(center: Vec3(-50, 3.0, -46), yawDegrees: 140),
-    Gate(center: Vec3(-56, 2.0, -16), yawDegrees: 185),
-    Gate(center: Vec3(-44, 6.5, 12), yawDegrees: 225, width: 5, height: 4),
-    Gate(center: Vec3(-18, 2.0, 22), yawDegrees: 270),
-    Gate(center: Vec3(4, 2.5, 8), yawDegrees: 330),
+    Gate(center: Vec3(0, 1.8, -18), yawDegrees: 0),
+    Gate(center: Vec3(-6, 2.6, -42), yawDegrees: 25),
+    Gate(center: Vec3(-26, 5.0, -58), yawDegrees: 75),
+    Gate(center: Vec3(-50, 2.6, -46), yawDegrees: 140),
+    Gate(center: Vec3(-56, 1.8, -16), yawDegrees: 185),
+    Gate(center: Vec3(-44, 6.0, 12), yawDegrees: 225, width: 4.2, height: 3.2),
+    Gate(center: Vec3(-18, 1.8, 22), yawDegrees: 270),
+    Gate(center: Vec3(4, 2.2, 8), yawDegrees: 330),
 ]

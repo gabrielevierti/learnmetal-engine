@@ -59,7 +59,9 @@ TEST(cube_has_24_vertices_and_outward_faces) {
 }
 
 TEST(primitives_have_consistent_winding_and_tangents) {
-    for (const MeshData& mesh : {MeshData::plane(4, 4, 3, 2), MeshData::sphere(1.5f, 24, 12), MeshData::cylinder(1, 2, 20)}) {
+    auto hills = [](float x, float z) { return std::sin(x * 0.7f) * 0.8f + std::cos(z * 0.5f) * 0.6f; };
+    for (const MeshData& mesh : {MeshData::plane(4, 4, 3, 2), MeshData::sphere(1.5f, 24, 12), MeshData::cylinder(1, 2, 20),
+                                 MeshData::cone(1, 2, 20), MeshData::heightfield(12, 8, 24, 16, hills, 3)}) {
         CHECK(windingMatchesNormals(mesh));
         CHECK(tangentsAreValid(mesh));
         CHECK(mesh.normals.size() == mesh.vertexCount() && mesh.uvs.size() == mesh.vertexCount());
@@ -67,6 +69,23 @@ TEST(primitives_have_consistent_winding_and_tangents) {
     }
     MeshData sphere = MeshData::sphere(1.5f, 24, 12);
     for (Vec3 p : sphere.positions) CHECK_NEAR(simd::length(p), 1.5, 1e-4);
+}
+
+TEST(heightfield_follows_its_function_and_leans_its_normals_downhill) {
+    // A ramp that rises one unit for every two units of x.
+    MeshData ramp = MeshData::heightfield(10, 6, 5, 3, [](float x, float) { return x * 0.5f; });
+    CHECK(ramp.vertexCount() == 6 * 4);
+    CHECK(ramp.indices.size() == 5 * 3 * 6);
+    for (size_t i = 0; i < ramp.vertexCount(); i++) {
+        CHECK_NEAR(ramp.positions[i].y, ramp.positions[i].x * 0.5f, 1e-5);
+        CHECK_NEAR(ramp.normals[i].x, -0.4472f, 1e-3);     // perpendicular to the slope: (-1, 2, 0) / sqrt(5)
+        CHECK_NEAR(ramp.normals[i].y, 0.8944f, 1e-3);
+    }
+    AABB bounds = ramp.bounds();
+    CHECK_NEAR(bounds.min.x, -5, 1e-5); CHECK_NEAR(bounds.max.z, 3, 1e-5); CHECK_NEAR(bounds.max.y, 2.5f, 1e-5);
+
+    MeshData cone = MeshData::cone(1, 2, 16);
+    CHECK_NEAR(cone.bounds().max.y, 1, 1e-6); CHECK_NEAR(cone.bounds().min.y, -1, 1e-6);
 }
 
 TEST(tangent_frames_point_along_u_and_up_the_texture) {

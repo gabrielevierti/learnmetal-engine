@@ -4,8 +4,11 @@
 // The game is a few small parts:
 //   FlightModel.swift   how the drone moves (pure math)
 //   Track.swift         gates, laps and the clock (pure logic)
+//   World.swift         the field, the trees, the gates, the drone to look at
 //   Controls.swift      thumbs, controller or keyboard -> stick positions
-//   FPVGame.swift       this file: the world, the frame, the screens
+//   Sounds.swift        motors, wind, beeps
+//   FPVGame.swift       this file: the flight, collisions, crashes, the radio link, the camera
+//   FPVHud.swift        what is drawn over the picture: the OSD, the menu, the results
 //
 // It runs on iPhone and iPad (see the iOS folder) and on a Mac (`swift run FPV`).
 
@@ -20,51 +23,72 @@ public final class FPVGame: Game {
     enum Mode {
         case race, free
     }
+    enum View {
+        case onboard, chase
+    }
 
-    private static let laps = 2
-    private static let droneRadius: Float = 0.2
-    private static let restHeight: Float = 0.12                 // the drone's center when it sits on the ground
-    private static let cameraTilt: Float = radians(22)          // FPV cameras look up, because the drone flies nose down
+    static let laps = 2
+    private static let substeps = 8                 // the flight model runs at 480 steps per second
 
-    private var screen = Screen.menu
-    private var mode = Mode.race
-    private var flightMode = FlightMode.angle
-    private var drone = Drone()
-    private var previousPosition = Vec3(0, 0, 0)
-    private var sticks = StickInput()
-    private var race = Race(gateCount: courseGates.count, laps: FPVGame.laps)
-    private let controls = Controls()
+    var screen = Screen.menu
+    var mode = Mode.race
+    var view = View.onboard
+    var flightMode = FlightMode.angle
+    var drone = Drone()
+    var sticks = StickInput()
+    var race = Race(gateCount: courseGates.count, laps: FPVGame.laps)
+    let controls = Controls()
+    var windSetting = 1                             // 0 calm, 1 a breeze, 2 gusty
+    var cameraTilt: Float = 30                      // degrees
+    var link: Float = 1                             // the radio link: 1 perfect, 0 lost
+    var isCrashed = false                           // tumbling or lying on the ground, motors off
+    var isWaitingToArm = false                      // back on its feet: the throttle must come down before the motors start
+    var bestTime: Float = 0                         // 0: no time yet
+    var isNewBest = false
+    var lostSignal = false                          // the crash in progress began with the radio link dropping
+    var flightTime: Float = 0
+    var flashTimer: Float = 0                       // a gate was just passed
+    var notice = ""                                 // a line shown for a few seconds
+    var noticeTimer: Float = 0
+    var airframeIndex = 0
 
-    private var crashTimer: Float = 0                           // above zero: just crashed, waiting to respawn
-    private var bestTime: Float = 0                             // 0: no time yet
-    private var isNewBest = false
-    private var flashTimer: Float = 0                           // a gate was just passed
+    var world = World()
+    var camera = Entity.invalid
+    private var model = DroneModel()
+    private var sounds = Sounds()
+    private var chaseEye = Vec3(0, 3, 6)
+    private var motorSounds: [SoundHandle] = []
+    private var windSound: SoundHandle = 0
+    private var random = Random(seed: 99)
 
-    private var camera = Entity.invalid
-    private var gateMaterial = Material()
-    private var nextGateMaterial = Material()
-    private var gateParts: [[Entity]] = []                      // the boxes that make up each gate
-    private var motorSound: SoundHandle = 0
-    private var gateSound = AudioClip()
-    private var crashSound = AudioClip()
-    private var finishSound = AudioClip()
+    private var isOnGround = true
+    private var isBlocked = false                   // something stands between the pilot and the drone
+    private var crashTimer: Float = 0               // seconds since the crash
+    private var restTimer: Float = 0                // seconds the wreck has been lying still
+    private var linkLostTimer: Float = 0
+    private var glitch: Float = 0                   // a burst of video noise, after a knock
+    private var alarmTimer: Float = 0
+    private var stepCount = 0
 
     public init() {}
 
-    // MARK: - The world
+    // MARK: - Setting up
 
     public func start(_ engine: Engine) {
-        let settings = UserDefaults.standard
-        bestTime = settings.float(forKey: "fpv.bestTime")
-        if settings.object(forKey: "fpv.fullStick") != nil { controls.throttleUsesFullStick = settings.bool(forKey: "fpv.fullStick") }
-        if settings.bool(forKey: "fpv.acro") { flightMode = .acro }
+        let saved = UserDefaults.standard
+        bestTime = saved.float(forKey: "fpv.bestTime")
+        if saved.object(forKey: "fpv.fullStick") != nil { controls.throttleUsesFullStick = saved.bool(forKey: "fpv.fullStick") }
+        if saved.bool(forKey: "fpv.acro") { flightMode = .acro }
+        if saved.object(forKey: "fpv.wind") != nil { windSetting = min(max(saved.integer(forKey: "fpv.wind"), 0), 2) }
         engine.input.stickDeadZone = 0.03           // radios are precise around the center: keep almost all of it
 
         var look = engine.renderer.settings
-        look.cascades.shadowDistance = 90
-        look.fogDensity = 0.006
+        look.cascades.shadowDistance = 130
+        look.fogDensity = 0.0022
         look.fogColor = look.sky.horizonColor
-        look.bloomIntensity = 0.07
+        look.sky.cloudCoverage = 0.5
+        look.sky.cloudScale = 1.1
+        look.bloomIntensity = 0.05
         #if os(iOS)
         // A phone has three pixels per point: render a little smaller and skip the most
         // expensive effect. The picture changes little, the frame rate a lot.
@@ -74,193 +98,254 @@ public final class FPVGame: Game {
         #endif
         engine.renderer.settings = look
 
-        buildWorld(engine)
-        makeSounds(engine)
-        resetDrone(toStart: true)
-        // `--race` skips the menu: used when a picture of the game is captured without a screen.
-        if engine.config.hasArgument("--race") { begin(.race) }
+        world = buildWorld(engine)
+        sounds = Sounds.make()
+        for i in 0..<4 {
+            motorSounds.append(engine.audio.play(sounds.motor, options: PlayOptions(volume: 0, pan: i % 2 == 0 ? 0.3 : -0.3, loops: true)))
+        }
+        windSound = engine.audio.play(sounds.wind, options: PlayOptions(volume: 0, loops: true))
+
+        camera = engine.scene.create("Camera")
+        engine.scene.add(camera, Transform())
+        engine.scene.add(camera, Camera(fovY: radians(60), nearPlane: 0.02, farPlane: 1200))
+
+        let config = engine.config
+        if config.hasArgument("--acro") { flightMode = .acro }
+        if config.hasArgument("--chase") { view = .chase }
+        if config.hasArgument("--sticks") { controls.showsSticks = true }
+        chooseAirframe(engine, config.hasArgument("--whoop") ? 1 : saved.integer(forKey: "fpv.drone"))
+        // These skip the menu: used when a picture of the game is captured without a screen.
+        if config.hasArgument("--race") { begin(.race) }
+        if config.hasArgument("--free") { begin(.free) }
     }
 
-    private func buildWorld(_ engine: Engine) {
-        let scene = engine.scene
-        let assets = engine.assets
-
-        let sun = scene.create("Sun")
-        scene.add(sun, Transform(rotation: .lookRotation(forward: Vec3(0.45, -0.8, -0.4))))
-        scene.add(sun, Light(type: .directional, color: Vec3(1.0, 0.95, 0.85), intensity: 3.5, castsShadows: true))
-
-        // The field: one big textured plane.
-        let grass = Material()
-        grass.baseColor = Vec4(0.62, 0.72, 0.52, 1)
-        grass.metallic = 1                           // factors of 1 let the texture maps decide
-        grass.roughness = 1
-        grass.uvScale = Vec2(150, 150)
-        grass.baseColorTexture = assets.texture("Textures/tiles_basecolor.png")
-        grass.normalTexture = assets.texture("Textures/tiles_normal.png", format: .rgba8)
-        grass.metallicRoughnessTexture = assets.texture("Textures/tiles_orm.png", format: .rgba8)
-        let ground = scene.create("Ground")
-        scene.add(ground, Transform(position: Vec3(-25, 0, -18), scale: Vec3(300, 1, 300)))
-        scene.add(ground, MeshRenderer(mesh: assets.plane, material: grass))
-
-        // Gates glow: orange, and green for the one to fly through next.
-        gateMaterial = assets.makeMaterial(baseColor: Vec4(0.08, 0.04, 0.02, 1), metallic: 0, roughness: 0.5)
-        gateMaterial.emissive = Vec3(2.4, 0.75, 0.15)
-        nextGateMaterial = assets.makeMaterial(baseColor: Vec4(0.02, 0.08, 0.03, 1), metallic: 0, roughness: 0.5)
-        nextGateMaterial.emissive = Vec3(0.3, 2.6, 0.6)
-        gateParts = courseGates.map { gate in buildGate(engine, gate) }
-
-        // Things to fly around: columns and stacks of crates, scattered by a fixed seed so
-        // that the field is the same every time.
-        let concrete = assets.makeMaterial(baseColor: Vec4(0.7, 0.7, 0.72, 1), metallic: 0, roughness: 0.85)
-        let wood = assets.makeMaterial(baseColor: Vec4(0.72, 0.5, 0.28, 1), metallic: 0, roughness: 0.8)
-        wood.baseColorTexture = assets.texture("Textures/checker_basecolor.png")
-        var random = Random(seed: 7)
-        var placed = 0
-        while placed < 26 {
-            let spot = Vec3(random.range(-85, 35), 0, random.range(-85, 45))
-            // Keep the start and the racing line (the straight path from each gate to the next) clear.
-            if simd_length(Vec2(spot.x, spot.z)) < 12 || distanceToCourse(Vec2(spot.x, spot.z)) < 9 { continue }
-            placed += 1
-            let entity = scene.create(placed % 2 == 0 ? "Column" : "Crates")
-            if placed % 2 == 0 {
-                let height = random.range(4, 11)
-                scene.add(entity, Transform(position: spot + Vec3(0, height * 0.5, 0), scale: Vec3(1.4, height, 1.4)))
-                scene.add(entity, MeshRenderer(mesh: assets.cylinder, material: concrete))
-                scene.add(entity, Collider.capsule(radius: 0.7, halfHeight: max(height * 0.5 - 0.7, 0)))
-            } else {
-                let size = Vec3(random.range(2, 4), random.range(1.5, 4), random.range(2, 4))
-                let turn = Quat(angle: random.range(0, Float.pi), axis: Vec3(0, 1, 0))
-                scene.add(entity, Transform(position: spot + Vec3(0, size.y * 0.5, 0), rotation: turn, scale: size))
-                scene.add(entity, MeshRenderer(mesh: assets.cube, material: wood))
-                scene.add(entity, Collider.box(halfExtents: size * 0.5))
-            }
-        }
-
-        camera = scene.create("FPV camera")
-        scene.add(camera, Transform())
-        scene.add(camera, Camera(fovY: radians(100), nearPlane: 0.05, farPlane: 700))
+    func chooseAirframe(_ engine: Engine, _ index: Int) {
+        airframeIndex = index == 1 ? 1 : 0
+        drone = Drone(airframeIndex == 1 ? .whoop : .fiveInch)
+        cameraTilt = drone.airframe.cameraTilt
+        if engine.scene.isAlive(model.root) { model.destroy(engine) }
+        model = DroneModel.build(engine, drone.airframe)
+        placeAtStart()
+        UserDefaults.standard.set(airframeIndex, forKey: "fpv.drone")
     }
 
-    /// A gate is a frame of boxes around its opening: two posts and a bar on top, and a
-    /// bar below if the opening does not reach the ground.
-    private func buildGate(_ engine: Engine, _ gate: Gate) -> [Entity] {
-        let thickness: Float = 0.3
-        let top = gate.center.y + gate.height * 0.5
-        let bottom = gate.center.y - gate.height * 0.5
-        var boxes: [(center: Vec3, size: Vec3)] = []
-        for side: Float in [-1, 1] {
-            let x = side * (gate.width + thickness) * 0.5
-            boxes.append((Vec3(x, (top + thickness) * 0.5 - gate.center.y, 0), Vec3(thickness, top + thickness, thickness)))
-        }
-        boxes.append((Vec3(0, gate.height * 0.5 + thickness * 0.5, 0), Vec3(gate.width, thickness, thickness)))
-        if bottom > 0.6 {
-            boxes.append((Vec3(0, -gate.height * 0.5 - thickness * 0.5, 0), Vec3(gate.width, thickness, thickness)))
-        }
-        return boxes.map { box in
-            let entity = engine.scene.create("Gate")
-            // The box is given in the gate's own space: turn it to face along the course.
-            engine.scene.add(entity, Transform(position: gate.center + gate.rotation.act(box.center), rotation: gate.rotation, scale: box.size))
-            engine.scene.add(entity, MeshRenderer(mesh: engine.assets.cube, material: gateMaterial))
-            engine.scene.add(entity, Collider.box(halfExtents: box.size * 0.5))
-            return entity
-        }
-    }
+    /// How high the drone's center is when it sits on its belly.
+    private var restHeight: Float { 0.035 * drone.airframe.armX / 0.0795 + 0.005 }
 
-    private func makeSounds(_ engine: Engine) {
-        // The motors: half a second of a buzzing wave, looped. Its pitch follows the throttle.
-        let buzz = synthesize(SynthParams(waveform: .sawtooth, frequency: 100, duration: 0.5, attack: 0, release: 0, volume: 0.35))
-        motorSound = engine.audio.play(buzz, options: PlayOptions(volume: 0, pitch: 1, loops: true))
-        gateSound = synthesize(SynthParams(waveform: .triangle, frequency: 1320, duration: 0.09, release: 0.06, volume: 0.3))
-        crashSound = synthesize(SynthParams(waveform: .noise, frequency: 0, duration: 0.35, attack: 0.001, release: 0.3, volume: 0.5, seed: 3))
-        finishSound = synthesizeSequence([523.25, 659.25, 783.99, 1046.5].map {
-            SynthParams(waveform: .triangle, frequency: $0, duration: 0.13, release: 0.08, volume: 0.3)
-        })
-    }
-
-    // MARK: - Flying
-
-    /// Puts the drone on the ground: at the start, or just past the last gate it flew through.
-    private func resetDrone(toStart: Bool) {
-        drone = Drone()
-        var position = Vec3(0, FPVGame.restHeight, 0)
-        var heading: Float = courseGates[0].yaw
-        if !toStart && mode == .race && (race.lap > 0 || race.nextGate > 0) {
-            let gate = courseGates[race.lastGate]
-            let next = courseGates[race.nextGate]
-            position = gate.center + gate.forward * 4
-            position.y = FPVGame.restHeight
-            // Face the gate to fly through next.
-            heading = atan2(-(next.center.x - position.x), -(next.center.z - position.z))
-        }
-        drone.position = position
-        drone.rotation = Quat(angle: heading, axis: Vec3(0, 1, 0))
-        previousPosition = position
+    /// On the launch mat, with a fresh battery, facing the first gate.
+    private func placeAtStart() {
+        drone.place(at: world.start + Vec3(0, restHeight + 0.02, 0), heading: courseGates[0].yaw)
+        drone.chargeBattery()
+        drone.isArmed = true
         controls.reset()
+        isCrashed = false
+        isWaitingToArm = false
+        lostSignal = false
+        isOnGround = true
         crashTimer = 0
+        restTimer = 0
+        linkLostTimer = 0
+        flightTime = 0
+        link = 1
+        chaseEye = drone.position + Vec3(0, 0.4, 1.2)
     }
 
-    private func begin(_ newMode: Mode) {
+    func begin(_ newMode: Mode) {
         mode = newMode
         race = Race(gateCount: courseGates.count, laps: FPVGame.laps)
         isNewBest = false
         screen = .flying
-        resetDrone(toStart: true)
+        placeAtStart()
     }
 
-    private func crash(_ engine: Engine) {
-        crashTimer = 1.1
-        drone.velocity = Vec3(0, 0, 0)
-        drone.angularVelocity = Vec3(0, 0, 0)
-        engine.audio.play(crashSound)
+    func toggleFlightMode() {
+        flightMode = flightMode == .angle ? .acro : .angle
+        UserDefaults.standard.set(flightMode == .acro, forKey: "fpv.acro")
     }
+
+    /// The wind at a moment and a height: steady, with gusts that come and go, and weaker
+    /// close to the ground, where the grass and the trees slow it down.
+    private func wind(at time: Double, height: Float) -> Vec3 {
+        let speeds: [Float] = [0, 3, 7]
+        let speed = speeds[min(max(windSetting, 0), 2)]
+        if speed <= 0 { return Vec3(0, 0, 0) }
+        let t = Float(time)
+        let gust = windSetting == 2 ? 0.55 + 0.9 * valueNoise(Vec2(t * 0.45, 3)) : 0.85 + 0.3 * valueNoise(Vec2(t * 0.2, 3))
+        let swing = (valueNoise(Vec2(t * 0.13, 9)) - 0.5) * 1.2                 // the direction wanders
+        let direction = Vec3(cos(0.35 + swing), 0, sin(0.35 + swing))
+        let lift = windSetting == 2 ? (valueNoise(Vec2(t * 0.7, 21)) - 0.5) * 0.25 * speed : 0
+        return (direction * (speed * gust) + Vec3(0, lift, 0)) * saturate(0.35 + height / 10)
+    }
+
+    // MARK: - Flying
 
     public func fixedUpdate(_ engine: Engine, dt: Float) {
         guard screen == .flying else { return }
-        if crashTimer > 0 {
-            crashTimer -= dt
-            if crashTimer <= 0 { resetDrone(toStart: false) }
-            return
+        stepCount += 1
+
+        // The race: three beeps and a long one, like start lights.
+        if mode == .race {
+            let before = Int(race.countdown.rounded(.up))
+            let wasCounting = race.phase == .countdown
+            race.update(dt: dt)
+            if wasCounting && race.phase == .running {
+                engine.audio.play(sounds.go)
+            } else if wasCounting && Int(race.countdown.rounded(.up)) != before {
+                engine.audio.play(sounds.beep)
+            }
         }
-        if mode == .race { race.update(dt: dt) }
-        // During the countdown the motors stay off.
+        // During the countdown the drone sits armed on its mat, propellers idling.
         var input = sticks
-        if mode == .race && race.phase == .countdown { input.throttle = 0 }
+        if mode == .race && race.phase == .countdown { input = StickInput() }
 
-        // Four small steps per physics step: at 670 degrees per second, a sixtieth of a
-        // second is too coarse.
-        let substeps = 4
-        for _ in 0..<substeps {
-            previousPosition = drone.position
-            drone.step(input, mode: flightMode, dt: dt / Float(substeps))
+        // A flight controller refuses to start the motors with the throttle up.
+        if isWaitingToArm && sticks.throttle < 0.08 {
+            isWaitingToArm = false
+            drone.isArmed = true
+        }
 
-            // The ground: a hard arrival is a crash, a gentle one is a landing.
-            if drone.position.y < FPVGame.restHeight {
-                if drone.velocity.y < -5 || drone.speed > 10 || drone.up.y < 0.3 {
-                    crash(engine)
-                    return
-                }
-                drone.position.y = FPVGame.restHeight
-                drone.velocity = Vec3(drone.velocity.x * 0.9, max(drone.velocity.y, 0), drone.velocity.z * 0.9)
-            }
-            // Everything else that is solid: gates, columns, crates.
-            if !engine.physics.overlapSphere(engine.scene, center: drone.position, radius: FPVGame.droneRadius).isEmpty {
-                crash(engine)
-                return
-            }
+        let h = dt / Float(FPVGame.substeps)
+        for i in 0..<FPVGame.substeps {
+            let previous = drone.position
+            let ground = groundHeight(drone.position.x, drone.position.z)
+            drone.heightAboveGround = drone.position.y - ground
+            drone.wind = wind(at: engine.time.elapsed, height: drone.heightAboveGround)
+            drone.step(input, mode: flightMode, dt: h)
+            collide(engine, previous: previous, dt: h, testSolids: i % 2 == 0)
+
             if mode == .race && race.phase == .running {
                 let gate = courseGates[race.nextGate]
-                if gate.isPassed(from: previousPosition, to: drone.position) && race.pass(gate: race.nextGate) {
+                if gate.isPassed(from: previous, to: drone.position) && race.pass(gate: race.nextGate) {
                     flashTimer = 0.25
-                    engine.audio.play(gateSound, options: PlayOptions(pitch: race.nextGate == 0 ? 1.5 : 1))
-                    if race.phase == .finished { finish(engine) }
+                    engine.audio.play(race.nextGate == 0 ? sounds.lap : sounds.gate)
+                    if race.phase == .finished {
+                        finish(engine)
+                        return
+                    }
                 }
             }
         }
+        if drone.isArmed && !isOnGround { flightTime += dt }
+
+        // ---- the radio link: it weakens with distance, and with anything solid in the way
+        let toDrone = drone.position - world.pilot
+        let distance = simd_length(toDrone)
+        if stepCount % 10 == 0 && distance > 1 {
+            let ray = Ray(origin: world.pilot, direction: toDrone / distance)
+            isBlocked = engine.physics.raycast(engine.scene, ray, maxDistance: distance - drone.airframe.radius * 2) != nil
+        }
+        var quality = 1 - saturate((distance / drone.airframe.range - 0.45) / 0.55)
+        if isBlocked { quality *= 0.6 }
+        link += (quality - link) * min(1, dt * 5)
+        // No signal for half a second: the receiver gives up and stops the motors. "Failsafe".
+        linkLostTimer = link < 0.03 ? linkLostTimer + dt : 0
+        if linkLostTimer > 0.5 && !isCrashed {
+            lostSignal = true
+            crash(engine, impact: 0)
+        }
+        if drone.charge <= 0 && !isCrashed && isOnGround && drone.speed < 0.5 {
+            notice = "Battery empty. A fresh one is in."
+            noticeTimer = 4
+            placeAtStart()
+        }
+
+        if isCrashed { recover(engine) }
+    }
+
+    /// Keeps the drone out of the ground and out of solid things, and decides whether a
+    /// touch was a bump or a crash.
+    private func collide(_ engine: Engine, previous: Vec3, dt: Float, testSolids: Bool) {
+        let a = drone.airframe
+        isOnGround = false
+
+        // ---- the ground. Upright, the drone sits on its belly; tumbling, it is a ball.
+        let ground = groundHeight(drone.position.x, drone.position.z)
+        let upright = saturate(drone.up.y)
+        let clearance = lerp(a.radius * 0.6, restHeight, upright * upright)
+        if drone.position.y < ground + clearance {
+            let normal = groundNormal(drone.position.x, drone.position.z)
+            let into = -simd_dot(drone.velocity, normal)
+            let along = drone.velocity + normal * into              // the part of the motion that slides
+            let sliding = simd_length(along)
+            let isHard = into > a.crashSpeed * 1.4 || (upright < 0.35 && drone.speed > 1.5) || (sliding > 11 && into > 0.3)
+            if drone.isArmed && isHard { crash(engine, impact: max(into, sliding * 0.4)) }
+            drone.position.y = ground + clearance
+            let bounce: Float = into > 1.5 ? 0.25 : 0
+            drone.velocity = along * (1 - min(1, (drone.isArmed ? 3 : 9) * dt)) + normal * (max(into, 0) * bounce)
+            isOnGround = true
+            if !drone.isArmed {
+                drone.angularVelocity *= 1 - min(1, 10 * dt)
+            } else if drone.thrust < a.mass * 9.81 * 0.6 && drone.speed < 2 {
+                // Landed: sit flat. (Otherwise the flight controller would fight the ground.)
+                let nose = drone.forward
+                let flat = Quat(angle: atan2(-nose.x, -nose.z), axis: Vec3(0, 1, 0))
+                drone.rotation = simd_slerp(drone.rotation, flat, min(1, 12 * dt))
+                drone.angularVelocity = Vec3(0, 0, 0)
+                // And it stays put: a breeze does not push a drone along the grass.
+                if drone.speed < 0.6 { drone.velocity = Vec3(0, 0, 0) }
+            }
+        }
+
+        // ---- everything else that is solid: gates, trees, the building
+        if !testSolids { return }
+        if engine.physics.overlapSphere(engine.scene, center: drone.position, radius: a.radius * 0.75).isEmpty { return }
+        // Which way does the surface face? Ask a ray along the path that led here.
+        let motion = drone.position - previous
+        let travelled = simd_length(motion)
+        var normal = -safeNormalize(drone.velocity, fallback: Vec3(0, 1, 0))
+        if travelled > 1e-5 {
+            let ray = Ray(origin: previous, direction: motion / travelled)
+            if let hit = engine.physics.raycast(engine.scene, ray, maxDistance: travelled + a.radius * 2) { normal = hit.normal }
+        }
+        let into = -simd_dot(drone.velocity, normal)
+        if into > 0 {
+            if drone.isArmed && into > a.crashSpeed { crash(engine, impact: into) }
+            // Bounce off, losing most of the speed that went into the surface.
+            drone.velocity = (drone.velocity + normal * (into * 1.3)) * 0.9
+            if drone.isArmed { drone.angularVelocity += random.onUnitSphere() * (into * 0.6) }
+            glitch = max(glitch, saturate(into / 6) * 0.5)
+        }
+        drone.position = previous + normal * 0.004
+    }
+
+    private func crash(_ engine: Engine, impact: Float) {
+        if isCrashed { return }
+        isCrashed = true
+        drone.isArmed = false
+        crashTimer = 0
+        restTimer = 0
+        drone.angularVelocity += random.onUnitSphere() * min(impact * 2.5, 25)      // it tumbles
+        glitch = 1
+        controls.reset()
+        if impact > 0 { engine.audio.play(sounds.crash, options: PlayOptions(volume: saturate(0.4 + impact / 12))) }
+    }
+
+    /// After a crash the wreck tumbles until it lies still. Then it is turned back onto its
+    /// feet where it stopped, as "turtle mode" does on a real quad, and the race goes on.
+    private func recover(_ engine: Engine) {
+        let dt = engine.time.fixedDelta
+        crashTimer += dt
+        restTimer = isOnGround && drone.speed < 0.5 ? restTimer + dt : 0
+        if restTimer < 0.8 && crashTimer < 6 { return }
+
+        if lostSignal {
+            // Too far to walk: the pilot carries it back.
+            notice = "Signal lost. Back at the start."
+            noticeTimer = 4
+            placeAtStart()
+            return
+        }
+        let nose = drone.forward
+        var place = drone.position
+        place.y = groundHeight(place.x, place.z) + restHeight
+        drone.place(at: place, heading: atan2(-nose.x, -nose.z))
+        isCrashed = false
+        isWaitingToArm = true
     }
 
     private func finish(_ engine: Engine) {
         screen = .finished
-        engine.audio.play(finishSound)
+        engine.audio.play(sounds.finish)
         if bestTime <= 0 || race.time < bestTime {
             bestTime = race.time
             isNewBest = true
@@ -268,181 +353,102 @@ public final class FPVGame: Game {
         }
     }
 
+    // MARK: - Every frame
+
     public func update(_ engine: Engine, dt: Float) {
         let input = engine.input
-        sticks = screen == .flying ? controls.read(engine, dt: dt, topBar: engine.safeArea.y + 60) : StickInput()
+        sticks = screen == .flying ? controls.read(engine, dt: dt, topBar: engine.safeArea.y + 56) : StickInput()
         flashTimer = max(0, flashTimer - dt)
+        noticeTimer = max(0, noticeTimer - dt)
+        glitch = max(0, glitch - dt * 2.5)
 
         // Controller buttons and keys, for those who are not touching the screen.
         if screen == .flying {
-            if input.wasPressed(GamepadButton.a) || input.wasPressed(Key.r) { resetDrone(toStart: false) }
+            if input.wasPressed(GamepadButton.a) || input.wasPressed(Key.r) { begin(mode) }
             if input.wasPressed(GamepadButton.x) || input.wasPressed(Key.m) { toggleFlightMode() }
+            if input.wasPressed(GamepadButton.y) || input.wasPressed(Key.c) { view = view == .onboard ? .chase : .onboard }
             if input.wasPressed(GamepadButton.b) || input.wasPressed(Key.escape) { screen = .menu }
         } else if input.wasPressed(GamepadButton.start) || input.wasPressed(Key.enter) {
             begin(.race)
         }
 
         // The gate to fly through next is green.
-        for (index, parts) in gateParts.enumerated() {
+        for (index, parts) in world.gateParts.enumerated() {
             let isNext = mode == .race && screen == .flying && index == race.nextGate
-            for part in parts { engine.scene[part, MeshRenderer.self]?.material = isNext ? nextGateMaterial : gateMaterial }
+            for part in parts { engine.scene[part, MeshRenderer.self]?.material = isNext ? world.nextGateMaterial : world.gateMaterial }
         }
 
-        // The camera rides on the drone, tilted up. In the menu it circles the field instead.
+        model.update(engine, drone, dt: dt)
+        updateCamera(engine, dt: dt)
+        updateSound(engine, dt: dt)
+    }
+
+    private func updateCamera(_ engine: Engine, dt: Float) {
+        guard var transform = engine.scene[camera, Transform.self], var lens = engine.scene[camera, Camera.self] else { return }
+        var look = engine.renderer.settings
+        let size = engine.screenSize
+        let aspect = size.x / max(size.y, 1)
+        let isOnboard = screen != .menu && view == .onboard
+
         if screen == .menu {
-            let angle = Float(engine.time.elapsed) * 0.12
-            let eye = Vec3(-25 + cos(angle) * 60, 22, -18 + sin(angle) * 60)
-            engine.scene[camera, Transform.self] = Transform(position: eye, rotation: .lookRotation(forward: Vec3(-25, 2, -18) - eye))
+            // The menu looks at the field from a slow circle above it.
+            let angle = Float(engine.time.elapsed) * 0.1 + 0.6
+            let eye = Vec3(-25 + cos(angle) * 72, 24, -18 + sin(angle) * 72)
+            transform.position = eye
+            transform.rotation = .lookRotation(forward: Vec3(-25, 3, -18) - eye)
+            lens.fovY = radians(55)
+        } else if isOnboard {
+            // The camera sits at the front of the drone, tilted up: flying fast means flying
+            // nose down, and the tilt is what keeps the horizon in the picture.
+            let s = drone.airframe.armX / 0.0795
+            transform.position = drone.position + drone.rotation.act(Vec3(0, 0.022 * s, -0.094 * s))
+            transform.rotation = drone.rotation * Quat(angle: radians(cameraTilt), axis: Vec3(1, 0, 0))
+            // FPV lenses are very wide: 125 degrees from side to side, whatever the shape of the screen.
+            lens.fovY = min(2 * atan(tan(radians(62.5)) / aspect), radians(112))
         } else {
-            let rotation = drone.rotation * Quat(angle: FPVGame.cameraTilt, axis: Vec3(1, 0, 0))
-            engine.scene[camera, Transform.self] = Transform(position: drone.position + drone.up * 0.05, rotation: rotation)
+            // From behind and above, following the way the drone points.
+            let s = 0.45 + 0.55 * drone.airframe.armX / 0.0795
+            let nose = drone.forward
+            let behind = -safeNormalize(Vec3(nose.x, 0, nose.z), fallback: Vec3(0, 0, -1))
+            let wanted = drone.position + behind * (1.0 * s) + Vec3(0, 0.32 * s, 0)
+            chaseEye = damp(chaseEye, wanted, sharpness: 9, dt: dt)
+            chaseEye.y = max(chaseEye.y, groundHeight(chaseEye.x, chaseEye.z) + 0.15)
+            transform.position = chaseEye
+            transform.rotation = .lookRotation(forward: drone.position - chaseEye)
+            lens.fovY = radians(62)
         }
+        engine.scene[camera, Transform.self] = transform
+        engine.scene[camera, Camera.self] = lens
 
-        // Motors: louder and higher with the throttle, silent in the menu and after a crash.
-        let isRunning = screen == .flying && crashTimer <= 0
-        engine.audio.mixer.setVolume(motorSound, isRunning ? 0.04 + 0.2 * sticks.throttle : 0)
-        engine.audio.mixer.setPitch(motorSound, 0.9 + 2.4 * sticks.throttle)
+        // The onboard picture comes through a small wide lens and a radio link, and shows it.
+        look.lensDistortion = isOnboard ? 0.38 : 0
+        look.chromaticAberration = isOnboard ? 0.007 : 0
+        look.filmGrain = isOnboard ? 0.022 : 0
+        look.vignette = isOnboard ? 0.4 : 0.25
+        let weak = saturate((0.5 - link) / 0.5)
+        look.interference = isOnboard ? saturate(weak * weak.squareRoot() * 0.9 + glitch * 0.6) : 0
+        engine.renderer.settings = look
     }
 
-    private func toggleFlightMode() {
-        flightMode = flightMode == .angle ? .acro : .angle
-        UserDefaults.standard.set(flightMode == .acro, forKey: "fpv.acro")
-    }
-
-    // MARK: - Screens
-
-    /// A button for fingers and for the mouse. Returns true in the frame it is pressed.
-    private func button(_ engine: Engine, _ canvas: Canvas, _ label: String, _ position: Vec2, _ size: Vec2, highlighted: Bool = false) -> Bool {
-        func isInside(_ p: Vec2) -> Bool {
-            p.x >= position.x && p.y >= position.y && p.x < position.x + size.x && p.y < position.y + size.y
+    private func updateSound(_ engine: Engine, dt: Float) {
+        let mixer = engine.audio.mixer
+        let isFlying = screen == .flying
+        // Four motors, four voices: each a little out of tune with the others, as real ones are.
+        let detune: [Float] = [1.0, 1.017, 0.985, 1.008]
+        for i in 0..<min(4, motorSounds.count) {
+            let speed = drone.motors[i]
+            mixer.setPitch(motorSounds[i], max(speed * drone.airframe.maxRevs / 100, 0.05) * detune[i])
+            mixer.setVolume(motorSounds[i], isFlying && speed > 0.01 ? 0.03 + 0.22 * pow(speed, 1.5) : 0)
         }
-        let input = engine.input
-        // Any finger counts, not only the first: one thumb may already be holding a stick.
-        let touched = input.touches.contains { $0.phase == .began && isInside($0.position) }
-        let clicked = input.touches.isEmpty && input.wasPressed(MouseButton.left) && isInside(input.mousePosition)
-        canvas.rect(position, size, highlighted ? rgb(0xfe8b3c, alpha: 0.9) : Vec4(0.04, 0.06, 0.1, 0.62))
-        canvas.rectOutline(position, size, thickness: 1, Vec4(1, 1, 1, 0.25))
-        let textSize = min(size.y * 0.42, 20)
-        canvas.text(label, position + Vec2(size.x * 0.5, (size.y - textSize) * 0.5 - 1), size: textSize,
-                    highlighted ? rgb(0x14181f) : Vec4(1, 1, 1, 0.95), align: .center)
-        return touched || clicked
-    }
+        let airspeed = simd_length(drone.velocity - drone.wind)
+        mixer.setVolume(windSound, isFlying ? min(0.5, airspeed * airspeed / 1600 * 0.6) : 0)
+        mixer.setPitch(windSound, 0.7 + airspeed / 45)
 
-    public func draw(_ engine: Engine, canvas: Canvas) {
-        switch screen {
-        case .menu: drawMenu(engine, canvas)
-        case .flying: drawFlying(engine, canvas)
-        case .finished: drawFinished(engine, canvas)
+        // The buzzer, when a cell is below 3.5 volts.
+        alarmTimer -= dt
+        if isFlying && drone.isArmed && drone.cellVoltage < 3.5 && alarmTimer <= 0 {
+            engine.audio.play(sounds.alarm)
+            alarmTimer = 2.5
         }
-    }
-
-    private func drawMenu(_ engine: Engine, _ canvas: Canvas) {
-        let size = canvas.size
-        let center = size.x * 0.5
-        canvas.rect(Vec2(0, 0), size, Vec4(0.02, 0.03, 0.06, 0.45))
-        canvas.text("FPV", Vec2(center, size.y * 0.10), size: 64, rgb(0xfe8b3c), align: .center)
-        canvas.text(bestTime > 0 ? "Best race: " + formatTime(bestTime) : "No race time yet", Vec2(center, size.y * 0.10 + 74),
-                    size: 17, Vec4(1, 1, 1, 0.8), align: .center)
-
-        let width: Float = 280, height: Float = 46, gap: Float = 10
-        var y = size.y * 0.10 + 112
-        if button(engine, canvas, "Race, \(FPVGame.laps) laps", Vec2(center - width * 0.5, y), Vec2(width, height), highlighted: true) { begin(.race) }
-        y += height + gap
-        if button(engine, canvas, "Free flight", Vec2(center - width * 0.5, y), Vec2(width, height)) { begin(.free) }
-        y += height + gap
-        if button(engine, canvas, flightMode == .angle ? "Mode: Angle (self-leveling)" : "Mode: Acro (rates)",
-                  Vec2(center - width * 0.5, y), Vec2(width, height)) { toggleFlightMode() }
-        y += height + gap
-        if button(engine, canvas, controls.throttleUsesFullStick ? "Controller throttle: whole stick" : "Controller throttle: upper half",
-                  Vec2(center - width * 0.5, y), Vec2(width, height)) {
-            controls.throttleUsesFullStick.toggle()
-            UserDefaults.standard.set(controls.throttleUsesFullStick, forKey: "fpv.fullStick")
-        }
-        let hint = engine.input.isGamepadConnected ? "Controller connected. Left stick: throttle and yaw. Right stick: pitch and roll."
-            : "Left thumb: throttle and yaw. Right thumb: pitch and roll. A controller or an RC radio works too."
-        canvas.text(hint, Vec2(center, size.y - engine.safeArea.w - 34), size: 14, Vec4(1, 1, 1, 0.75), align: .center)
-    }
-
-    private func drawFlying(_ engine: Engine, _ canvas: Canvas) {
-        let size = canvas.size, safe = engine.safeArea
-        let white = Vec4(1, 1, 1, 0.95)
-        let top = safe.y + 10
-        let left = safe.x + 14, right = size.x - safe.z - 14
-
-        // The strip of buttons at the top.
-        if button(engine, canvas, "Menu", Vec2(left, top), Vec2(74, 40)) { screen = .menu }
-        if button(engine, canvas, "Reset", Vec2(left + 82, top), Vec2(74, 40)) { resetDrone(toStart: false) }
-        if button(engine, canvas, flightMode == .angle ? "Angle" : "Acro", Vec2(right - 84, top), Vec2(84, 40), highlighted: flightMode == .acro) {
-            toggleFlightMode()
-        }
-
-        // Speed and height, bottom center: between the sticks, out of the way.
-        let kmh = Int(drone.speed * 3.6)
-        canvas.text("\(kmh) km/h    \(String(format: "%.1f", Double(max(drone.position.y, 0)))) m", Vec2(size.x * 0.5, size.y - safe.w - 30),
-                    size: 16, Vec4(1, 1, 1, 0.85), align: .center)
-
-        if mode == .race {
-            canvas.text(formatTime(race.time), Vec2(size.x * 0.5, top + 2), size: 28, white, align: .center)
-            canvas.text("Lap \(min(race.lap + 1, race.laps)) / \(race.laps)    Gate \(race.nextGate + 1) / \(race.gateCount)",
-                        Vec2(size.x * 0.5, top + 36), size: 15, Vec4(1, 1, 1, 0.8), align: .center)
-            if race.phase == .countdown {
-                canvas.text("\(Int(race.countdown.rounded(.up)))", Vec2(size.x * 0.5, size.y * 0.32), size: 96, rgb(0xfe8b3c), align: .center)
-            }
-            drawGateMarker(engine, canvas, courseGates[race.nextGate])
-        }
-        if flashTimer > 0 { canvas.rect(Vec2(0, 0), size, Vec4(0.3, 1, 0.5, 0.25 * flashTimer / 0.25)) }
-        if crashTimer > 0 {
-            canvas.rect(Vec2(0, 0), size, Vec4(0.5, 0.05, 0.02, 0.45))
-            canvas.text("Crashed", Vec2(size.x * 0.5, size.y * 0.36), size: 44, white, align: .center)
-        }
-        controls.draw(engine, canvas)
-    }
-
-    /// Shows where the next gate is: a ring on it when it is in view, an arrow at the edge
-    /// of the screen when it is not.
-    private func drawGateMarker(_ engine: Engine, _ canvas: Canvas, _ gate: Gate) {
-        guard let transform = engine.scene[camera, Transform.self], let lens = engine.scene[camera, Camera.self] else { return }
-        let size = canvas.size
-        // The gate as the camera sees it: x right, y up, -z ahead.
-        let local = transform.rotation.inverse.act(gate.center - transform.position)
-        let green = rgb(0x7dff9a)
-        let tangent = tan(lens.fovY * 0.5)
-        if local.z < -0.5 {
-            let x = local.x / (-local.z * tangent * size.x / size.y), y = local.y / (-local.z * tangent)
-            if abs(x) < 0.95 && abs(y) < 0.95 {
-                let point = Vec2((x * 0.5 + 0.5) * size.x, (0.5 - y * 0.5) * size.y)
-                canvas.circle(center: point, radius: 9, green, segments: 20)
-                canvas.circle(center: point, radius: 6, Vec4(0, 0, 0, 0.5), segments: 20)
-                canvas.text("\(Int(simd_length(local))) m", point + Vec2(0, 12), size: 13, green, align: .center)
-                return
-            }
-        }
-        // Out of view: point toward it from the middle of the nearer side.
-        let isLeft = local.x < 0
-        let tip = Vec2(isLeft ? engine.safeArea.x + 26 : size.x - engine.safeArea.z - 26, size.y * 0.42)
-        let back: Float = isLeft ? 18 : -18
-        canvas.line(from: tip + Vec2(back, -14), to: tip, thickness: 4, green)
-        canvas.line(from: tip + Vec2(back, 14), to: tip, thickness: 4, green)
-    }
-
-    private func drawFinished(_ engine: Engine, _ canvas: Canvas) {
-        let size = canvas.size
-        let center = size.x * 0.5
-        canvas.rect(Vec2(0, 0), size, Vec4(0.02, 0.03, 0.06, 0.6))
-        var y = size.y * 0.14
-        canvas.text("Finished", Vec2(center, y), size: 46, rgb(0xfe8b3c), align: .center)
-        y += 62
-        canvas.text(formatTime(race.time), Vec2(center, y), size: 38, Vec4(1, 1, 1, 1), align: .center)
-        y += 50
-        canvas.text(isNewBest ? "New best time" : "Best: " + formatTime(bestTime), Vec2(center, y), size: 18,
-                    isNewBest ? rgb(0x7dff9a) : Vec4(1, 1, 1, 0.8), align: .center)
-        y += 30
-        for (index, lapTime) in race.lapTimes.enumerated() {
-            canvas.text("Lap \(index + 1)   " + formatTime(lapTime), Vec2(center, y), size: 16, Vec4(1, 1, 1, 0.8), align: .center)
-            y += 22
-        }
-        y += 14
-        if button(engine, canvas, "Race again", Vec2(center - 150, y), Vec2(144, 46), highlighted: true) { begin(.race) }
-        if button(engine, canvas, "Menu", Vec2(center + 6, y), Vec2(144, 46)) { screen = .menu }
     }
 }

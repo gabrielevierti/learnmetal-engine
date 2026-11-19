@@ -116,6 +116,11 @@ typedef struct {
     // Fog.
     simd_float3 fogColor;
     float fogDensity;
+
+    // Clouds, drawn by the sky.
+    float cloudCoverage;             // 0 clear sky, 1 overcast
+    simd_float2 cloudOffset;         // how far the wind has carried them
+    float cloudScale;                // larger numbers make smaller clouds
 } FrameUniforms;
 
 typedef struct {
@@ -158,6 +163,12 @@ typedef struct {
     float vignette;
     uint32_t toneMapper;             // 0 ACES, 1 Reinhard, 2 none
     float filterRadius;
+    // The camera's lens and its video signal.
+    float lensDistortion;            // 0 none; above, straight lines bow outward as through a wide lens
+    float chromaticAberration;       // colors separate toward the corners
+    float grain;                     // fine noise, as from a small sensor
+    float interference;              // 0 a clean picture; 1 an analog video link about to drop
+    float time;                      // seconds, so that noise moves
 } PostUniforms;
 
 typedef struct {

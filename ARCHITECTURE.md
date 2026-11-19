@@ -106,13 +106,28 @@ It is an arcade model on purpose. Bodies do not spin from impacts, there are no 
 
 With `--capture` no window is created at all: the engine renders into an ordinary texture, copies it to memory and writes a PNG.
 
+The Swift engine also runs on iOS. What a window gives the engine is described by a small protocol, `Surface`: a size in points, a scale, the safe area, and the next drawable. `Window` provides it on a Mac; on iOS `EngineViewController` does, with an `MTKView`, and feeds touches to `Input` (the first finger also moves the mouse, so interfaces written for a mouse work under a thumb).
+
+## The canvas
+
+`Rendering/Canvas` turns every 2D call into triangles in one vertex buffer; the renderer draws them after tone mapping, one draw call per change of texture or clip.
+
+- **Smooth edges** come from the geometry, not from multisampling. A convex shape is drawn half a pixel smaller than asked and surrounded by a strip one pixel wide whose outer vertices have zero alpha; a line is a solid core with such a strip on each side. Rounded rectangles, circles, rings and arcs are paths given to those two routines. The canvas needs to know how many pixels a point is, which the engine passes to `begin`.
+- **Clipping** (`pushClip`, `popClip`) is recorded per batch and applied by the renderer as a scissor rectangle, rounded to pixels and kept inside the target.
+
 ## Scene files, the Gui and the editor
 
 - **Scene files** (`Scene/SceneFile`) are text, one statement per line: settings, then materials, then entities with one line per component. Meshes and textures are stored by name (`Mesh.name`, `Texture.name`, set by `Assets`), never as data. Unknown lines are skipped. Numbers are written in the shortest form that reads back to the same float, so saving an unchanged scene changes nothing in the file.
-- **The Gui** (`UI/Gui`) is immediate-mode: a control is a function call that draws it and returns what the user did. It needs only a `Canvas` and an `Input`. Rows that are scrolled out of a panel are skipped whole, which is how panels clip without a scissor rectangle. The pop-up of a list is drawn in `end()`, on top of everything, and its choice reaches the control one frame later.
+- **The Gui** (`UI/Gui`) is immediate-mode: a control is a function call that draws it and returns what the user did. It needs only a `Canvas` and an `Input`. A panel clips its rows with the canvas, so they scroll smoothly under its edges; rows entirely outside are skipped and do not react. Sections fold and remember it under an id made from their title. Icons are drawn by code from lines and arcs. Besides the controls laid out in panels there are free ones (`bar`, `card`, `button`, `iconButton` with a position), which is what tool bars are made of. The pop-up of a list and the tooltip are drawn in `end()`, on top of everything; a pop-up's choice reaches the control one frame later.
 - **The editor** (`Cpp/editor`, `Swift/Editor`) is a `Game`. It keeps its own camera in the scene, marked `EditorOnly` so that it is not saved, and points `Renderer.cameraOverride` at it. `Engine.isSimulationPaused` keeps physics still while editing. Undo is a stack of scene files in memory: after every finished edit the scene is written to text and compared with the last one. Play does the same once, and Stop reads that text back.
+
+## FPV
+
+`Cpp/fpv` and `Swift/FPVKit` are the second game, and a different kind of one: its physics is its own. `FlightModel` is a rigid body with four motors, integrated 480 times per second inside the engine's 60 fixed steps, and it knows nothing about the engine beyond its math types. Each step runs, in order: the rates the sticks ask for, a PID loop per axis, a mixer, motors that lag and sag with the battery, propellers whose thrust depends on the air moving through them, drag, and the battery itself. The gains of the PID loops are computed from the airframe (mass, inertia, arm length, motor response), so that different drones answer alike.
+
+The game around it uses the engine for everything else. The ground is a height function, which the game asks directly; other obstacles are engine colliders, found with `overlapSphere`, and a ray along the last piece of the path gives the surface to bounce off. The radio link is a distance and a raycast from where the pilot stands. The onboard look is four render settings (lens distortion, color fringes, grain, interference), and the last one is driven by the link.
 
 ## Testing
 
-- **Unit tests** cover everything that does not need a GPU: math, the scene, input, time, meshes, collision (including a test that tries thousands of random shape pairs and checks that the reported contact really separates them), physics, cascades, particles, the synthesizer, the mixer, shader file handling, fonts, the canvas, the Gui (by feeding it mouse and key events) and scene files (write, read, write again, compare). The Swift tests are ports of the C++ ones, with the same expected numbers; a few C++ cases are merged into one Swift test.
+- **Unit tests** cover everything that does not need a GPU: math, the scene, input, time, meshes, collision (including a test that tries thousands of random shape pairs and checks that the reported contact really separates them), physics, cascades, particles, the synthesizer, the mixer, shader file handling, fonts, the canvas, the Gui (by feeding it mouse and key events), scene files (write, read, write again, compare), and FPV's flight model: hover throttle, the response to a stick, top speed, battery sag and endurance, and control at every throttle. The Swift tests are ports of the C++ ones, with the same expected numbers; a few C++ cases are merged into one Swift test.
 - **The autopilot** (`--demo`) rolls the marble through the whole course. Combined with `--capture`, it runs unattended and exits with an error if the marble does not reach the goal. It tests the game loop, the physics, the triggers and the level together.

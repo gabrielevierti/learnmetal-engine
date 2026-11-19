@@ -355,6 +355,11 @@ void Renderer::renderFinal(MTL::CommandBuffer* commandBuffer, const Canvas& canv
     uniforms.bloomIntensity = hasBloom ? settings.bloomIntensity : 0.0f;
     uniforms.vignette = settings.vignette;
     uniforms.toneMapper = uint32_t(settings.toneMapper);
+    uniforms.lensDistortion = settings.lensDistortion;
+    uniforms.chromaticAberration = settings.chromaticAberration;
+    uniforms.grain = settings.filmGrain;
+    uniforms.interference = settings.interference;
+    uniforms.time = float(time_);
 
     auto pass = NS::TransferPtr(MTL::RenderPassDescriptor::alloc()->init());
     MTL::RenderPassColorAttachmentDescriptor* color = pass->colorAttachments()->object(0);
@@ -382,11 +387,11 @@ void Renderer::renderFinal(MTL::CommandBuffer* commandBuffer, const Canvas& canv
     }
 
     // The 2D canvas goes on top, after tone mapping: interface colors must not be tone mapped.
-    drawCanvas(encoder, canvas, target.texture->pixelFormat());
+    drawCanvas(encoder, canvas, target.texture);
     encoder->endEncoding();
 }
 
-void Renderer::drawCanvas(MTL::RenderCommandEncoder* encoder, const Canvas& canvas, MTL::PixelFormat format) {
+void Renderer::drawCanvas(MTL::RenderCommandEncoder* encoder, const Canvas& canvas, MTL::Texture* target) {
     const std::vector<gpu::CanvasVertex>& vertices = canvas.vertices();
     Vec2 size = canvas.size();
     if (vertices.empty() || size.x <= 0 || size.y <= 0) return;
@@ -401,12 +406,27 @@ void Renderer::drawCanvas(MTL::RenderCommandEncoder* encoder, const Canvas& canv
     encoder->setFragmentBytes(&uniforms, sizeof(uniforms), gpu::LMBufferPass);
     encoder->setFragmentSamplerState(device_.linearClampSampler(), 0);
 
+    // Clips are given in points; the scissor rectangle that enforces them is in pixels and
+    // must stay inside the target, or Metal stops the program.
+    int width = int(target->width()), height = int(target->height());
+    Vec2 pixelsPerPoint{float(width) / size.x, float(height) / size.y};
+
     for (const Canvas::Batch& batch : canvas.batches()) {
         if (batch.vertexCount == 0) continue;
+        MTL::ScissorRect scissor{0, 0, NS::UInteger(width), NS::UInteger(height)};
+        if (batch.isClipped) {
+            int x0 = std::clamp(int(std::lround(batch.clipMin.x * pixelsPerPoint.x)), 0, width);
+            int y0 = std::clamp(int(std::lround(batch.clipMin.y * pixelsPerPoint.y)), 0, height);
+            int x1 = std::clamp(int(std::lround(batch.clipMax.x * pixelsPerPoint.x)), 0, width);
+            int y1 = std::clamp(int(std::lround(batch.clipMax.y * pixelsPerPoint.y)), 0, height);
+            if (x1 <= x0 || y1 <= y0) continue;
+            scissor = MTL::ScissorRect{NS::UInteger(x0), NS::UInteger(y0), NS::UInteger(x1 - x0), NS::UInteger(y1 - y0)};
+        }
+        encoder->setScissorRect(scissor);
         PipelineDescription description;
         description.vertexFunction = "vertex_canvas";
         description.fragmentFunction = batch.isText ? "fragment_canvas_text" : "fragment_canvas";
-        description.colorFormat = format;
+        description.colorFormat = target->pixelFormat();
         description.blend = BlendMode::AlphaBlend;
         MTL::RenderPipelineState* pipeline = shaders_.pipeline(description);
         if (!pipeline) continue;

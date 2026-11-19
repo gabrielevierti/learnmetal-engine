@@ -138,6 +138,8 @@ std::string writeScene(Scene& scene, const std::vector<NamedMaterial>& materials
     Line("exposure").number(settings.exposure).to(out);
     Line("toneMapper").integer(settings.toneMapper).to(out);
     Line("vignette").number(settings.vignette).to(out);
+    Line("clouds").number(settings.sky.cloudCoverage).number(settings.sky.cloudScale).to(out);
+    Line("lens").number(settings.lensDistortion).number(settings.chromaticAberration).number(settings.filmGrain).to(out);
 
     // ---- materials: the named ones, then any other that an entity uses
     std::vector<NamedMaterial> all = materials;
@@ -284,6 +286,14 @@ bool readScene(const std::string& text, Scene& scene, std::vector<NamedMaterial>
             } else if (key == "exposure") settings.exposure = words.number(1);
             else if (key == "toneMapper") settings.toneMapper = int(words.integer());
             else if (key == "vignette") settings.vignette = words.number();
+            else if (key == "clouds") {
+                settings.sky.cloudCoverage = words.number();
+                settings.sky.cloudScale = words.number(1);
+            } else if (key == "lens") {
+                settings.lensDistortion = words.number();
+                settings.chromaticAberration = words.number();
+                settings.filmGrain = words.number();
+            }
 
         // ---- a material
         } else if (block == Block::Material && material) {

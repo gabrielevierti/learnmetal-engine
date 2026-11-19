@@ -126,6 +126,81 @@ MeshData MeshData::plane(float width, float depth, int subdivisions, float uvSca
     return mesh;
 }
 
+MeshData MeshData::heightfield(float width, float depth, int columns, int rows, const std::function<float(float, float)>& height,
+                               float uvScale) {
+    MeshData mesh;
+    columns = std::max(columns, 1);
+    rows = std::max(rows, 1);
+    float stepX = width / float(columns), stepZ = depth / float(rows);
+    for (int j = 0; j <= rows; j++) {
+        for (int i = 0; i <= columns; i++) {
+            float u = float(i) / float(columns), v = float(j) / float(rows);
+            float x = (u - 0.5f) * width, z = (v - 0.5f) * depth;
+            // The slope in each direction, measured over one cell on either side: the
+            // normal leans away from the uphill side.
+            float slopeX = (height(x + stepX, z) - height(x - stepX, z)) / (2.0f * stepX);
+            float slopeZ = (height(x, z + stepZ) - height(x, z - stepZ)) / (2.0f * stepZ);
+            mesh.positions.push_back(Vec3{x, height(x, z), z});
+            mesh.normals.push_back(simd::normalize(Vec3{-slopeX, 1, -slopeZ}));
+            mesh.tangents.push_back(vec4(simd::normalize(Vec3{1, slopeX, 0}), 1));
+            mesh.uvs.push_back(Vec2{u * uvScale, v * uvScale});
+        }
+    }
+    uint32_t stride = uint32_t(columns + 1);
+    for (uint32_t j = 0; j < uint32_t(rows); j++) {
+        for (uint32_t i = 0; i < uint32_t(columns); i++) {
+            uint32_t a = j * stride + i, b = a + stride, c = b + 1, d = a + 1;
+            mesh.indices.insert(mesh.indices.end(), {a, b, c, a, c, d});
+        }
+    }
+    return mesh;
+}
+
+MeshData MeshData::cone(float radius, float height, int segments) {
+    MeshData mesh;
+    segments = std::max(segments, 3);
+    float h = height * 0.5f;
+    // The side leans inward: its normal points out and a little up.
+    float slant = std::sqrt(radius * radius + height * height);
+    float outward = height / slant, upward = radius / slant;
+
+    // Side: a ring at the base, and one vertex at the point for every segment, because
+    // each needs its own normal.
+    for (int ring = 0; ring < 2; ring++) {
+        for (int s = 0; s <= segments; s++) {
+            float u = (float(s) + (ring == 0 ? 0.5f : 0.0f)) / float(segments), theta = u * 2.0f * kPi;
+            Vec3 n{std::sin(theta) * outward, upward, std::cos(theta) * outward};
+            mesh.positions.push_back(ring == 0 ? Vec3{0, h, 0} : Vec3{std::sin(theta) * radius, -h, std::cos(theta) * radius});
+            mesh.normals.push_back(n);
+            mesh.tangents.push_back(Vec4{std::cos(theta), 0, -std::sin(theta), 1});
+            mesh.uvs.push_back(Vec2{u, float(ring)});
+        }
+    }
+    uint32_t stride = uint32_t(segments + 1);
+    for (uint32_t s = 0; s < uint32_t(segments); s++) {
+        mesh.indices.insert(mesh.indices.end(), {s, stride + s, stride + s + 1});
+    }
+
+    // The base: a center vertex and a ring, facing down.
+    uint32_t center = uint32_t(mesh.positions.size());
+    mesh.positions.push_back(Vec3{0, -h, 0});
+    mesh.normals.push_back(Vec3{0, -1, 0});
+    mesh.tangents.push_back(Vec4{1, 0, 0, -1});
+    mesh.uvs.push_back(Vec2{0.5f, 0.5f});
+    for (int s = 0; s <= segments; s++) {
+        float theta = float(s) / float(segments) * 2.0f * kPi;
+        float x = std::sin(theta), z = std::cos(theta);
+        mesh.positions.push_back(Vec3{x * radius, -h, z * radius});
+        mesh.normals.push_back(Vec3{0, -1, 0});
+        mesh.tangents.push_back(Vec4{1, 0, 0, -1});
+        mesh.uvs.push_back(Vec2{x * 0.5f + 0.5f, z * 0.5f + 0.5f});
+    }
+    for (uint32_t s = 0; s < uint32_t(segments); s++) {
+        mesh.indices.insert(mesh.indices.end(), {center, center + 2 + s, center + 1 + s});
+    }
+    return mesh;
+}
+
 MeshData MeshData::sphere(float radius, int segments, int rings) {
     MeshData mesh;
     segments = std::max(segments, 3);

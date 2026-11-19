@@ -6,8 +6,8 @@ using namespace lm;
 
 namespace {
 
-// A panel at the origin, 300 x 400. With the default style its first row is at y = 34
-// and every next one 25 lower; a field starts at x = 115 and a row ends at x = 292.
+// A panel at the origin, 300 x 400. With the default style its first row is at y = 40
+// and every next one 28 lower; a field starts at x = 110 and a row ends at x = 290.
 struct Fixture {
     Canvas canvas;
     Input input;
@@ -35,7 +35,7 @@ struct Fixture {
         input.handleKey(key, true);
         input.handleKey(key, false);
     }
-    static float rowY(int row) { return 34.0f + 25.0f * float(row) + 11.0f; }
+    static float rowY(int row) { return 40.0f + 28.0f * float(row) + 12.0f; }
 };
 
 }  // namespace
@@ -186,7 +186,7 @@ TEST(gui_text_field_confirms_with_enter_and_cancels_with_escape) {
 
 TEST(gui_combo_opens_a_list_and_takes_the_choice) {
     Fixture f;
-    int index = 0;
+    int index = 2;
     int hidden = 0;
     std::vector<std::string> items = {"cube", "sphere", "plane"};
     auto body = [&](Gui& gui) {
@@ -199,14 +199,14 @@ TEST(gui_combo_opens_a_list_and_takes_the_choice) {
     f.release();
     f.frame(body);
     CHECK(f.gui.wantsMouse());
-    // The list hangs below the field: its second item covers the button on the next row.
-    f.moveTo(150, 34 + 22 + 22 + 11);
+    // The list hangs below the field: its first item covers the button on the next row.
+    f.moveTo(150, Fixture::rowY(1));
     f.press();
     f.frame(body);
     CHECK(hidden == 0);                         // the button under the list did not react
     f.release();
     f.frame(body);                              // the choice arrives one frame later
-    CHECK(index == 1);
+    CHECK(index == 0);
     CHECK(f.gui.changed());
     f.frame(body);
     f.moveTo(600, 300);
@@ -223,17 +223,107 @@ TEST(gui_rows_scrolled_out_of_a_panel_do_not_react) {
             if (gui.button("Row " + std::to_string(i))) clicks += 1000 + i;
         }
     };
-    // 40 rows do not fit in 400 points. The rows past the bottom edge are not there.
-    f.moveTo(150, 395);
+    // 40 rows do not fit in 400 points. The rows past the bottom edge are cut off there.
+    f.moveTo(150, 410);
     f.press();
     f.frame(body);
     CHECK(clicks == 0);
     f.release();
     f.frame(body);
-    f.input.handleScroll(-2);                   // scroll down by four rows
+    f.moveTo(150, 200);                         // the wheel scrolls the panel the pointer is on
+    f.input.handleScroll(-2);                   // scroll down by six rows
     f.frame(body);
     f.moveTo(150, Fixture::rowY(0));
     f.press();
     f.frame(body);
-    CHECK(clicks == 1004);
+    CHECK(clicks == 1006);
+    f.release();
+    f.frame(body);
+
+    // A row that is half under the title reacts on the half that shows, and only there.
+    f.input.handleScroll(-1.0f / 6.0f);         // half a row further
+    f.frame(body);
+    clicks = 0;
+    f.moveTo(150, 33);                          // below the title: the lower half of row 6
+    f.press();
+    f.frame(body);
+    CHECK(clicks == 1006);
+    f.release();
+    f.frame(body);
+    clicks = 0;
+    f.moveTo(150, 27);                          // on the title, where the upper half would be
+    f.press();
+    f.frame(body);
+    CHECK(clicks == 0);
+}
+
+TEST(gui_section_folds_and_remembers) {
+    Fixture f;
+    int clicks = 0;
+    bool wasOpen = false;
+    auto body = [&](Gui& gui) {
+        wasOpen = gui.section("Transform");
+        if (wasOpen && gui.button("Inside")) clicks++;
+        if (gui.button("After")) clicks += 100;
+    };
+    f.frame(body);
+    CHECK(wasOpen);                             // sections start open
+    f.moveTo(150, Fixture::rowY(0));
+    f.press();
+    f.frame(body);
+    f.release();
+    f.frame(body);
+    CHECK(!wasOpen);                            // a click on the title folds it
+    // The button after it moved up into the second row.
+    f.moveTo(150, Fixture::rowY(1));
+    f.press();
+    f.frame(body);
+    CHECK(clicks == 100);
+    f.release();
+    f.frame(body);
+    f.frame(body);
+    CHECK(!wasOpen);                            // and it stays folded
+}
+
+TEST(gui_free_buttons_work_outside_panels) {
+    Canvas canvas;
+    Input input;
+    Gui gui;
+    int tools = 0, saves = 0;
+    auto frame = [&] {
+        canvas.begin(Vec2{800, 600});
+        gui.begin(canvas, input);
+        gui.bar(Vec2{0, 0}, Vec2{800, 40});
+        if (gui.iconButton(Gui::Icon::Move, Vec2{10, 6}, Vec2{28, 28}, "Move", true)) tools++;
+        if (gui.button("Save", Vec2{700, 6}, Vec2{80, 28})) saves++;
+        gui.end();
+        input.endFrame();
+    };
+    auto moveTo = [&](float x, float y) { input.handleMouseMove(Vec2{x, y}, Vec2{x, y} - input.mousePosition()); };
+    frame();
+    moveTo(24, 20);
+    frame();
+    CHECK(gui.wantsMouse());                    // the bar belongs to the interface
+    input.handleMouseButton(MouseButton::Left, true);
+    frame();
+    CHECK(tools == 1 && saves == 0);
+    input.handleMouseButton(MouseButton::Left, false);
+    frame();
+    moveTo(740, 20);
+    input.handleMouseButton(MouseButton::Left, true);
+    frame();
+    CHECK(tools == 1 && saves == 1);
+    input.handleMouseButton(MouseButton::Left, false);
+    moveTo(400, 300);
+    frame();
+    frame();
+    CHECK(!gui.wantsMouse());                   // the 3D view below the bar is free
+
+    // Every icon can be drawn, at any size.
+    canvas.begin(Vec2{800, 600});
+    gui.begin(canvas, input);
+    for (int i = 0; i <= int(Gui::Icon::ChevronDown); i++) gui.icon(Gui::Icon(i), Vec2{20.0f + float(i) * 30, 100}, 16, rgb(0xffffff));
+    gui.end();
+    CHECK(canvas.vertices().size() > 500);
+    for (const gpu::CanvasVertex& v : canvas.vertices()) CHECK(std::isfinite(v.position.x) && std::isfinite(v.position.y));
 }

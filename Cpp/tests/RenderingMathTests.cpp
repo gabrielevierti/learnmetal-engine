@@ -30,7 +30,7 @@ TEST(gpu_structs_have_the_sizes_the_shaders_expect) {
     CHECK(offsetof(gpu::PassUniforms, time) == 336);
     CHECK(offsetof(gpu::LightData, type) == 48);
     CHECK(offsetof(gpu::FrameUniforms, cascadeSplits) == 256);
-    CHECK(sizeof(gpu::FrameUniforms) == 496);
+    CHECK(sizeof(gpu::FrameUniforms) == 512);
     CHECK(offsetof(gpu::FrameUniforms, lightCount) == 352);
     CHECK(offsetof(gpu::FrameUniforms, fogDensity) == 480);
 }
@@ -262,7 +262,7 @@ TEST(canvas_batches_by_texture_and_lays_out_text) {
     CHECK(canvas.batches()[1].texture == sprite && !canvas.batches()[1].isText);
     CHECK(canvas.batches()[2].texture == atlas && canvas.batches()[2].isText);
     CHECK(canvas.batches()[2].vertexCount == 12);        // the space draws nothing
-    CHECK(canvas.batches()[3].vertexCount == 24);
+    CHECK(canvas.batches()[3].vertexCount == 66);        // six triangles inside, and two per side for the soft edge
 
     // Centered: the line is 24 + 10 + 22 = 56 wide, so the first glyph starts at 400 - 28 + offsetX.
     const gpu::CanvasVertex& first = canvas.vertices()[canvas.batches()[2].firstVertex];
@@ -278,6 +278,70 @@ TEST(canvas_batches_by_texture_and_lays_out_text) {
 
     canvas.begin(Vec2{800, 600});
     CHECK(canvas.vertices().empty() && canvas.batches().empty());
+}
+
+TEST(canvas_shapes_fade_out_over_one_pixel) {
+    Canvas canvas;
+    canvas.begin(Vec2{800, 600}, 2.0f);                 // a Retina display: one pixel is half a point
+    CHECK_NEAR(canvas.pixelSize(), 0.5f, 1e-6f);
+    canvas.roundedRect(Vec2{100, 100}, Vec2{200, 80}, 12, Vec4{1, 0, 0, 0.8f});
+    CHECK(canvas.batches().size() == 1);
+    CHECK(canvas.vertices().size() % 3 == 0);
+    int solid = 0, clear = 0;
+    for (const gpu::CanvasVertex& v : canvas.vertices()) {
+        // Nothing is drawn more than half a pixel outside the rectangle asked for.
+        CHECK(v.position.x >= 100 - 0.26f && v.position.x <= 300 + 0.26f);
+        CHECK(v.position.y >= 100 - 0.26f && v.position.y <= 180 + 0.26f);
+        if (v.color.w == 0.0f) clear++; else { solid++; CHECK_NEAR(v.color.w, 0.8f, 1e-6f); }
+    }
+    CHECK(solid > 0 && clear > 0);
+
+    // A circle touches its radius on all four sides.
+    canvas.begin(Vec2{800, 600});
+    canvas.circle(Vec2{50, 50}, 20, Vec4{1, 1, 1, 1});
+    float minX = 1e9f, maxX = -1e9f;
+    for (const gpu::CanvasVertex& v : canvas.vertices()) { minX = std::min(minX, v.position.x); maxX = std::max(maxX, v.position.x); }
+    CHECK_NEAR(minX, 29.5f, 0.2f);
+    CHECK_NEAR(maxX, 70.5f, 0.2f);
+}
+
+TEST(a_line_thinner_than_a_pixel_is_drawn_fainter) {
+    Canvas canvas;
+    canvas.begin(Vec2{800, 600});
+    canvas.line(Vec2{10, 10}, Vec2{110, 10}, 0.25f, Vec4{1, 1, 1, 1});
+    CHECK(!canvas.vertices().empty());
+    float strongest = 0, top = 1e9f, bottom = -1e9f;
+    for (const gpu::CanvasVertex& v : canvas.vertices()) {
+        strongest = std::max(strongest, v.color.w);
+        top = std::min(top, v.position.y);
+        bottom = std::max(bottom, v.position.y);
+    }
+    CHECK_NEAR(strongest, 0.25f, 1e-5f);
+    CHECK_NEAR(bottom - top, 2.0f, 1e-4f);              // one pixel, fading on both sides
+}
+
+TEST(canvas_clips_nest_and_split_draw_calls) {
+    Canvas canvas;
+    canvas.begin(Vec2{800, 600});
+    canvas.rect(Vec2{0, 0}, Vec2{10, 10}, Vec4{1, 1, 1, 1});
+    canvas.pushClip(Vec2{100, 100}, Vec2{200, 200});
+    canvas.rect(Vec2{0, 0}, Vec2{10, 10}, Vec4{1, 1, 1, 1});
+    canvas.pushClip(Vec2{250, 50}, Vec2{200, 100});     // sticks out of the first one
+    canvas.rect(Vec2{0, 0}, Vec2{10, 10}, Vec4{1, 1, 1, 1});
+    canvas.pushClip(Vec2{0, 0}, Vec2{50, 50});          // entirely outside: nothing can be drawn
+    canvas.rect(Vec2{0, 0}, Vec2{10, 10}, Vec4{1, 1, 1, 1});
+    canvas.circle(Vec2{5, 5}, 4, Vec4{1, 1, 1, 1});
+    canvas.popClip();
+    canvas.popClip();
+    canvas.popClip();
+    canvas.rect(Vec2{0, 0}, Vec2{10, 10}, Vec4{1, 1, 1, 1});
+    canvas.popClip();                                   // one too many: harmless
+
+    CHECK(canvas.batches().size() == 4);
+    CHECK(!canvas.batches()[0].isClipped && canvas.batches()[1].isClipped && !canvas.batches()[3].isClipped);
+    const Canvas::Batch& nested = canvas.batches()[2];
+    CHECK(simd::all(nested.clipMin == Vec2{250, 100}) && simd::all(nested.clipMax == Vec2{300, 150}));
+    CHECK(canvas.vertices().size() == 4 * 6);
 }
 
 TEST(debug_draw_builds_line_lists) {

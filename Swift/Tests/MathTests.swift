@@ -123,6 +123,30 @@ final class MathTests: XCTestCase {
 }
 
 extension MathTests {
+    func testNoiseIsRepeatableSmoothAndStaysInRange() {
+        XCTAssertEqual(hashNoise(3, -7, seed: 1), hashNoise(3, -7, seed: 1))
+        XCTAssertNotEqual(hashNoise(3, -7, seed: 1), hashNoise(3, -7, seed: 2))
+        XCTAssertNotEqual(hashNoise(3, -7, seed: 1), hashNoise(4, -7, seed: 1))
+        var lowest: Float = 1, highest: Float = 0, sum: Float = 0
+        var count = 0
+        for y in stride(from: Float(-6), to: 6, by: 0.173) {
+            for x in stride(from: Float(-6), to: 6, by: 0.191) {
+                let n = fractalNoise(Vec2(x, y), octaves: 4, seed: 9)
+                XCTAssertTrue(n >= 0 && n < 1)
+                lowest = min(lowest, n)
+                highest = max(highest, n)
+                sum += n
+                count += 1
+                // Smooth: a small step changes the value a little.
+                XCTAssertLessThan(abs(valueNoise(Vec2(x + 0.01, y)) - valueNoise(Vec2(x, y))), 0.03)
+            }
+        }
+        XCTAssertTrue(lowest < 0.3 && highest > 0.7)                // it uses its range
+        XCTAssertEqual(sum / Float(count), 0.5, accuracy: 0.05)
+        // At the grid points it is exactly the hash.
+        XCTAssertEqual(valueNoise(Vec2(2, 5), seed: 3), hashNoise(2, 5, seed: 3), accuracy: 1e-6)
+    }
+
     func testEulerAnglesComeBackOutOfARotation() {
         for angles in [Vec3(0.3, -1.2, 0.5), Vec3(-1.0, 2.5, -0.7), Vec3(0, 0, 0), Vec3(1.2, 0.1, 3.0), Vec3(0, -3.0, 0)] {
             let back = Quat(pitch: angles.x, yaw: angles.y, roll: angles.z).eulerAngles

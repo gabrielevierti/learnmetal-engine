@@ -67,6 +67,11 @@ inline Vec3 damp(Vec3 current, Vec3 target, float sharpness, float dt) {
 }
 
 /// normalize() that returns `fallback` instead of NaN for a zero-length vector.
+inline Vec2 safeNormalize(Vec2 v, Vec2 fallback) {
+    float lengthSquared = simd::dot(v, v);
+    return lengthSquared > 1e-12f ? v / std::sqrt(lengthSquared) : fallback;
+}
+
 inline Vec3 safeNormalize(Vec3 v, Vec3 fallback = Vec3{0, 1, 0}) {
     float lengthSquared = simd::length_squared(v);
     return lengthSquared > 1e-12f ? v / std::sqrt(lengthSquared) : fallback;
@@ -280,6 +285,44 @@ inline std::optional<float> intersectPlane(const Ray& ray, const Plane& plane) {
 }
 
 // ---------------------------------------------------------------- random numbers
+
+// ---------------------------------------------------------------- noise
+
+/// A repeatable random number in [0, 1) for a point of the integer grid. The same
+/// point and seed always give the same number, on every machine.
+inline float hashNoise(int x, int y, uint32_t seed = 0) {
+    uint32_t h = uint32_t(x) * 0x8da6b343u + uint32_t(y) * 0xd8163841u + seed * 0xcb1ab31fu;
+    h ^= h >> 13;
+    h *= 0x5bd1e995u;
+    h ^= h >> 15;
+    return float(h & 0xffffffu) / float(0x1000000);
+}
+
+/// Smooth noise in [0, 1): random values at the corners of a unit grid, blended in
+/// between. Looks like soft blobs about one unit wide.
+inline float valueNoise(Vec2 p, uint32_t seed = 0) {
+    float fx = std::floor(p.x), fy = std::floor(p.y);
+    int x = int(fx), y = int(fy);
+    float tx = p.x - fx, ty = p.y - fy;
+    tx = tx * tx * (3.0f - 2.0f * tx);
+    ty = ty * ty * (3.0f - 2.0f * ty);
+    float top = lerp(hashNoise(x, y, seed), hashNoise(x + 1, y, seed), tx);
+    float bottom = lerp(hashNoise(x, y + 1, seed), hashNoise(x + 1, y + 1, seed), tx);
+    return lerp(top, bottom, ty);
+}
+
+/// Several layers of valueNoise, each twice as fine and half as strong as the one
+/// before, scaled back to [0, 1). The usual recipe for terrain, clouds and dirt.
+inline float fractalNoise(Vec2 p, int octaves = 4, uint32_t seed = 0) {
+    float sum = 0, strength = 0.5f, total = 0;
+    for (int i = 0; i < octaves; i++) {
+        sum += strength * valueNoise(p, seed + uint32_t(i));
+        total += strength;
+        p = p * 2.0f;
+        strength *= 0.5f;
+    }
+    return total > 0 ? sum / total : 0;
+}
 
 /// A small, fast, seedable generator (PCG32). The same seed gives the same sequence on
 /// every machine and in both the C++ and the Swift engine, which keeps gameplay and

@@ -157,6 +157,83 @@ public struct MeshData {
         return mesh
     }
 
+    /// Terrain: a grid in the XZ plane whose height at (x, z) is given by a function.
+    /// `uvScale` repeats the texture that many times across the whole grid.
+    public static func heightfield(width: Float, depth: Float, columns: Int, rows: Int, uvScale: Float = 1,
+                                   height: (Float, Float) -> Float) -> MeshData {
+        var mesh = MeshData()
+        let columns = max(columns, 1), rows = max(rows, 1)
+        let stepX = width / Float(columns), stepZ = depth / Float(rows)
+        for j in 0...rows {
+            for i in 0...columns {
+                let u = Float(i) / Float(columns), v = Float(j) / Float(rows)
+                let x = (u - 0.5) * width, z = (v - 0.5) * depth
+                // The slope in each direction, measured over one cell on either side: the
+                // normal leans away from the uphill side.
+                let slopeX = (height(x + stepX, z) - height(x - stepX, z)) / (2 * stepX)
+                let slopeZ = (height(x, z + stepZ) - height(x, z - stepZ)) / (2 * stepZ)
+                mesh.positions.append(Vec3(x, height(x, z), z))
+                mesh.normals.append(simd_normalize(Vec3(-slopeX, 1, -slopeZ)))
+                let tangent = simd_normalize(Vec3(1, slopeX, 0))
+                mesh.tangents.append(Vec4(tangent.x, tangent.y, tangent.z, 1))
+                mesh.uvs.append(Vec2(u * uvScale, v * uvScale))
+            }
+        }
+        let stride = UInt32(columns + 1)
+        for j in 0..<UInt32(rows) {
+            for i in 0..<UInt32(columns) {
+                let a = j * stride + i, b = a + stride, c = b + 1, d = a + 1
+                mesh.indices.append(contentsOf: [a, b, c, a, c, d])
+            }
+        }
+        return mesh
+    }
+
+    /// A cone around the Y axis, point up, with a flat base.
+    public static func cone(radius: Float = 0.5, height: Float = 1, segments: Int = 32) -> MeshData {
+        var mesh = MeshData()
+        let segments = max(segments, 3)
+        let h = height * 0.5
+        // The side leans inward: its normal points out and a little up.
+        let slant = (radius * radius + height * height).squareRoot()
+        let outward = height / slant, upward = radius / slant
+
+        // Side: a ring at the base, and one vertex at the point for every segment, because
+        // each needs its own normal.
+        for ring in 0..<2 {
+            for s in 0...segments {
+                let u = (Float(s) + (ring == 0 ? 0.5 : 0)) / Float(segments), theta = u * 2 * Float.pi
+                mesh.positions.append(ring == 0 ? Vec3(0, h, 0) : Vec3(sin(theta) * radius, -h, cos(theta) * radius))
+                mesh.normals.append(Vec3(sin(theta) * outward, upward, cos(theta) * outward))
+                mesh.tangents.append(Vec4(cos(theta), 0, -sin(theta), 1))
+                mesh.uvs.append(Vec2(u, Float(ring)))
+            }
+        }
+        let stride = UInt32(segments + 1)
+        for s in 0..<UInt32(segments) {
+            mesh.indices.append(contentsOf: [s, stride + s, stride + s + 1])
+        }
+
+        // The base: a center vertex and a ring, facing down.
+        let center = UInt32(mesh.positions.count)
+        mesh.positions.append(Vec3(0, -h, 0))
+        mesh.normals.append(Vec3(0, -1, 0))
+        mesh.tangents.append(Vec4(1, 0, 0, -1))
+        mesh.uvs.append(Vec2(0.5, 0.5))
+        for s in 0...segments {
+            let theta = Float(s) / Float(segments) * 2 * Float.pi
+            let x = sin(theta), z = cos(theta)
+            mesh.positions.append(Vec3(x * radius, -h, z * radius))
+            mesh.normals.append(Vec3(0, -1, 0))
+            mesh.tangents.append(Vec4(1, 0, 0, -1))
+            mesh.uvs.append(Vec2(x * 0.5 + 0.5, z * 0.5 + 0.5))
+        }
+        for s in 0..<UInt32(segments) {
+            mesh.indices.append(contentsOf: [center, center + 2 + s, center + 1 + s])
+        }
+        return mesh
+    }
+
     public static func sphere(radius: Float = 0.5, segments: Int = 32, rings: Int = 16) -> MeshData {
         var mesh = MeshData()
         let segments = max(segments, 3), rings = max(rings, 2)

@@ -10,6 +10,7 @@
 
 #include "Math/Math.hpp"
 
+#include <functional>
 #include <optional>
 #include <string_view>
 #include <vector>
@@ -49,6 +50,12 @@ struct MeshData {
     static MeshData sphere(float radius = 0.5f, int segments = 32, int rings = 16);
     /// A capped cylinder around the Y axis.
     static MeshData cylinder(float radius = 0.5f, float height = 1, int segments = 32);
+    /// A cone around the Y axis, point up, with a flat base.
+    static MeshData cone(float radius = 0.5f, float height = 1, int segments = 32);
+    /// Terrain: a grid in the XZ plane whose height at (x, z) is given by a function.
+    /// `uvScale` repeats the texture that many times across the whole grid.
+    static MeshData heightfield(float width, float depth, int columns, int rows, const std::function<float(float, float)>& height,
+                                float uvScale = 1);
 
     /// Parses Wavefront OBJ text: v, vt, vn and f records, polygons of any size,
     /// negative indices. Materials and groups are ignored. Returns nothing if the

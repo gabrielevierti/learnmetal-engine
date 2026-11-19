@@ -70,6 +70,12 @@ file(GLOB LM_MARBLE_SOURCES CONFIGURE_DEPENDS Cpp/marble/*.cpp Cpp/marble/*.hpp)
 add_executable(marble ${LM_MARBLE_SOURCES})
 target_link_libraries(marble PRIVATE lmengine)
 
+# ---------------------------------------------------------------- FPV, the drone game
+file(GLOB LM_FPV_SOURCES CONFIGURE_DEPENDS Cpp/fpv/*.cpp Cpp/fpv/*.hpp)
+add_executable(fpv ${LM_FPV_SOURCES})
+target_include_directories(fpv PRIVATE Cpp)
+target_link_libraries(fpv PRIVATE lmengine)
+
 # ---------------------------------------------------------------- the editor
 file(GLOB LM_EDITOR_SOURCES CONFIGURE_DEPENDS Cpp/editor/*.cpp Cpp/editor/*.hpp)
 add_executable(editor ${LM_EDITOR_SOURCES})
@@ -80,7 +86,8 @@ target_link_libraries(editor PRIVATE lmengine)
 #   ctest --test-dir build -L gpu      the autopilot plays the whole course on the GPU, without a window
 enable_testing()
 file(GLOB LM_TEST_SOURCES CONFIGURE_DEPENDS Cpp/tests/*.cpp Cpp/tests/*.hpp)
-add_executable(lmtests ${LM_TEST_SOURCES})
+add_executable(lmtests ${LM_TEST_SOURCES} Cpp/fpv/FlightModel.cpp Cpp/fpv/Track.cpp)
+target_include_directories(lmtests PRIVATE Cpp)
 target_link_libraries(lmtests PRIVATE lmengine)
 add_test(NAME unit COMMAND lmtests)
 set_tests_properties(unit PROPERTIES LABELS unit)
@@ -88,3 +95,5 @@ add_test(NAME marble-demo COMMAND marble --demo --capture ${CMAKE_BINARY_DIR}/ma
 set_tests_properties(marble-demo PROPERTIES LABELS gpu TIMEOUT 600)
 add_test(NAME editor-opens-demo COMMAND editor demo --capture ${CMAKE_BINARY_DIR}/editor-demo.png --frames 5)
 set_tests_properties(editor-opens-demo PROPERTIES LABELS gpu TIMEOUT 600)
+add_test(NAME fpv-starts-a-race COMMAND fpv --race --capture ${CMAKE_BINARY_DIR}/fpv-race.png --frames 240)
+set_tests_properties(fpv-starts-a-race PROPERTIES LABELS gpu TIMEOUT 600)

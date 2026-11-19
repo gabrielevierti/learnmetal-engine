@@ -118,6 +118,8 @@ public func writeScene(_ scene: Scene, materials: [NamedMaterial], settings: Ren
     Line("exposure").number(settings.exposure).to(&out)
     Line("toneMapper").integer(settings.toneMapper).to(&out)
     Line("vignette").number(settings.vignette).to(&out)
+    Line("clouds").number(settings.sky.cloudCoverage).number(settings.sky.cloudScale).to(&out)
+    Line("lens").number(settings.lensDistortion).number(settings.chromaticAberration).number(settings.filmGrain).to(&out)
 
     // ---- materials: the named ones, then any other that an entity uses
     var all = materials
@@ -345,6 +347,13 @@ public func readScene(_ text: String, into scene: Scene, materials: inout [Named
             case "exposure": settings.exposure = words.number(1)
             case "toneMapper": settings.toneMapper = words.integer()
             case "vignette": settings.vignette = words.number()
+            case "clouds":
+                settings.sky.cloudCoverage = words.number()
+                settings.sky.cloudScale = words.number(1)
+            case "lens":
+                settings.lensDistortion = words.number()
+                settings.chromaticAberration = words.number()
+                settings.filmGrain = words.number()
             default: break
             }
 

@@ -12,6 +12,8 @@ settings
   exposure 1
   toneMapper 0
   vignette 0.25
+  clouds 0 1
+  lens 0 0 0
 material "Tiles"
   baseColor 1 1 1 1
   metallic 1

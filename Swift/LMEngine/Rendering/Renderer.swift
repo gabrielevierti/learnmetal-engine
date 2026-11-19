@@ -31,6 +31,9 @@ public struct SkySettings {
     public var intensity: Float = 1
     public var sunDiskIntensity: Float = 30             // how much brighter than the sunlight the disk itself looks
     public var sunAngularRadius: Float = radians(1.2)
+    public var cloudCoverage: Float = 0                 // 0 a clear sky, 1 overcast
+    public var cloudScale: Float = 1                    // larger numbers make smaller clouds
+    public var cloudSpeed = Vec2(0.012, 0.004)          // how fast the wind carries them
 
     public init() {}
 }
@@ -63,6 +66,12 @@ public struct RenderSettings {
     public var exposure: Float = 1
     public var toneMapper = 0                           // 0 ACES, 1 Reinhard, 2 none
     public var vignette: Float = 0.25
+
+    // The camera's lens and video signal: what makes a picture look filmed, not computed.
+    public var lensDistortion: Float = 0                // 0 none; 0.3 an action camera; 0.6 a fisheye
+    public var chromaticAberration: Float = 0           // colors separate toward the corners; 0.01 is plenty
+    public var filmGrain: Float = 0                     // fine noise; 0.03 is visible
+    public var interference: Float = 0                  // 0 clean, 1 an analog video link about to drop
 
     public init() {}
 }
@@ -139,6 +148,7 @@ public final class Renderer {
     private let allocators: [FrameAllocator]
     private var frameIndex = 0
     private var frameNumber: UInt64 = 0
+    var frameTime: Double = 0                           // of the frame being drawn
     private let frameSemaphore = DispatchSemaphore(value: Renderer.framesInFlight)
 
     let white: Texture
@@ -474,6 +484,10 @@ public final class Renderer {
         frame.sunDiskSize = cos(settings.sky.sunAngularRadius)
         frame.fogColor = settings.fogColor
         frame.fogDensity = settings.fogDensity
+        frame.cloudCoverage = settings.sky.cloudCoverage
+        frame.cloudScale = settings.sky.cloudScale
+        frame.cloudOffset = settings.sky.cloudSpeed * Float(time)
+        frameTime = time
 
         // ---- what the camera can see, in the order it will be drawn
         let frustum = Frustum(viewProjection: view.viewProjection)

@@ -44,6 +44,10 @@ public:
     // ---- made in code
 
     std::shared_ptr<Mesh> makeMesh(const MeshData& data);
+    /// A texture from pixels computed by the program: four bytes each (red, green, blue,
+    /// alpha), row by row from the top. For noise, gradients, anything drawn by code.
+    std::shared_ptr<Texture> makeTexture(const std::vector<uint8_t>& pixels, int width, int height,
+                                         TextureFormat format = TextureFormat::RGBA8_sRGB);
     std::shared_ptr<Material> makeMaterial(Vec4 baseColor, float metallic = 0.0f, float roughness = 0.6f);
 
     /// Shared unit shapes: a cube with sides of 1, a sphere and a cylinder of diameter 1,

@@ -94,6 +94,13 @@ public final class Assets {
 
     public func makeMesh(_ data: MeshData) -> Mesh { Mesh(device, data) }
 
+    /// A texture from pixels computed by the program: four bytes each (red, green, blue,
+    /// alpha), row by row from the top. For noise, gradients, anything drawn by code.
+    public func makeTexture(pixels: [UInt8], width: Int, height: Int, format: TextureFormat = .rgba8sRGB) -> Texture? {
+        if width <= 0 || height <= 0 || pixels.count < width * height * (format == .r8 ? 1 : 4) { return nil }
+        return Texture.fromPixels(device, pixels: pixels, width: width, height: height, format: format, mipmaps: true)
+    }
+
     public func makeMaterial(baseColor: Vec4, metallic: Float = 0, roughness: Float = 0.6) -> Material {
         let material = Material()
         material.baseColor = baseColor

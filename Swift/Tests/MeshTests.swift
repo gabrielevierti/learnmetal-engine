@@ -68,7 +68,11 @@ final class MeshTests: XCTestCase {
     func testPrimitivesHaveConsistentWindingAndTangents() {
         let meshes = [MeshData.plane(width: 4, depth: 4, subdivisions: 3, uvScale: 2),
                       MeshData.sphere(radius: 1.5, segments: 24, rings: 12),
-                      MeshData.cylinder(radius: 1, height: 2, segments: 20)]
+                      MeshData.cylinder(radius: 1, height: 2, segments: 20),
+                      MeshData.cone(radius: 1, height: 2, segments: 20),
+                      MeshData.heightfield(width: 12, depth: 8, columns: 24, rows: 16, uvScale: 3) { x, z in
+                          sin(x * 0.7) * 0.8 + cos(z * 0.5) * 0.6
+                      }]
         for mesh in meshes {
             XCTAssertTrue(windingMatchesNormals(mesh))
             XCTAssertTrue(tangentsAreValid(mesh))
@@ -77,6 +81,26 @@ final class MeshTests: XCTestCase {
         }
         for p in meshes[1].positions { XCTAssertEqual(simd_length(p), 1.5, accuracy: 1e-4) }
         XCTAssertEqual(meshes[1].indices.count, 24 * (2 * 12 - 2) * 3)
+    }
+
+    func testHeightfieldFollowsItsFunctionAndLeansItsNormalsDownhill() {
+        // A ramp that rises one unit for every two units of x.
+        let ramp = MeshData.heightfield(width: 10, depth: 6, columns: 5, rows: 3) { x, _ in x * 0.5 }
+        XCTAssertEqual(ramp.vertexCount, 6 * 4)
+        XCTAssertEqual(ramp.indices.count, 5 * 3 * 6)
+        for i in 0..<ramp.vertexCount {
+            XCTAssertEqual(ramp.positions[i].y, ramp.positions[i].x * 0.5, accuracy: 1e-5)
+            XCTAssertEqual(ramp.normals[i].x, -0.4472, accuracy: 1e-3)      // perpendicular to the slope: (-1, 2, 0) / sqrt(5)
+            XCTAssertEqual(ramp.normals[i].y, 0.8944, accuracy: 1e-3)
+        }
+        let bounds = ramp.bounds
+        XCTAssertEqual(bounds.min.x, -5, accuracy: 1e-5)
+        XCTAssertEqual(bounds.max.z, 3, accuracy: 1e-5)
+        XCTAssertEqual(bounds.max.y, 2.5, accuracy: 1e-5)
+
+        let cone = MeshData.cone(radius: 1, height: 2, segments: 16)
+        XCTAssertEqual(cone.bounds.max.y, 1, accuracy: 1e-6)
+        XCTAssertEqual(cone.bounds.min.y, -1, accuracy: 1e-6)
     }
 
     func testTangentFramesPointAlongUAndUpTheTexture() {

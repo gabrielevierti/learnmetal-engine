@@ -2,8 +2,8 @@ import XCTest
 import simd
 @testable import LMEngine
 
-// A panel at the origin, 300 x 400. With the default style its first row is at y = 34
-// and every next one 25 lower; a field starts at x = 115 and a row ends at x = 292.
+// A panel at the origin, 300 x 400. With the default style its first row is at y = 40
+// and every next one 28 lower; a field starts at x = 110 and a row ends at x = 290.
 private final class Fixture {
     let canvas = Canvas()
     let input = Input()
@@ -28,7 +28,7 @@ private final class Fixture {
         input.handleKey(key, down: true)
         input.handleKey(key, down: false)
     }
-    static func rowY(_ row: Int) -> Float { 34 + 25 * Float(row) + 11 }
+    static func rowY(_ row: Int) -> Float { 40 + 28 * Float(row) + 12 }
 }
 
 final class GuiTests: XCTestCase {
@@ -178,7 +178,7 @@ final class GuiTests: XCTestCase {
 
     func testComboOpensAListAndTakesTheChoice() {
         let f = Fixture()
-        var index = 0
+        var index = 2
         var hidden = 0
         let body: (Gui) -> Void = { gui in
             gui.combo("Mesh", &index, ["cube", "sphere", "plane"])
@@ -190,14 +190,14 @@ final class GuiTests: XCTestCase {
         f.release()
         f.frame(body)
         XCTAssertTrue(f.gui.wantsMouse)
-        // The list hangs below the field: its second item covers the button on the next row.
-        f.moveTo(150, 34 + 22 + 22 + 11)
+        // The list hangs below the field: its first item covers the button on the next row.
+        f.moveTo(150, Fixture.rowY(1))
         f.press()
         f.frame(body)
         XCTAssertEqual(hidden, 0)                   // the button under the list did not react
         f.release()
         f.frame(body)                               // the choice arrives one frame later
-        XCTAssertEqual(index, 1)
+        XCTAssertEqual(index, 0)
         XCTAssertTrue(f.gui.changed)
         f.frame(body)
         f.moveTo(600, 300)
@@ -212,18 +212,112 @@ final class GuiTests: XCTestCase {
         let body: (Gui) -> Void = { gui in
             for i in 0..<40 where gui.button("Row \(i)") { clicks += 1000 + i }
         }
-        // 40 rows do not fit in 400 points. The rows past the bottom edge are not there.
-        f.moveTo(150, 395)
+        // 40 rows do not fit in 400 points. The rows past the bottom edge are cut off there.
+        f.moveTo(150, 410)
         f.press()
         f.frame(body)
         XCTAssertEqual(clicks, 0)
         f.release()
         f.frame(body)
-        f.input.handleScroll(-2)                    // scroll down by four rows
+        f.moveTo(150, 200)                          // the wheel scrolls the panel the pointer is on
+        f.input.handleScroll(-2)                    // scroll down by six rows
         f.frame(body)
         f.moveTo(150, Fixture.rowY(0))
         f.press()
         f.frame(body)
-        XCTAssertEqual(clicks, 1004)
+        XCTAssertEqual(clicks, 1006)
+        f.release()
+        f.frame(body)
+
+        // A row that is half under the title reacts on the half that shows, and only there.
+        f.input.handleScroll(-1.0 / 6.0)            // half a row further
+        f.frame(body)
+        clicks = 0
+        f.moveTo(150, 33)                           // below the title: the lower half of row 6
+        f.press()
+        f.frame(body)
+        XCTAssertEqual(clicks, 1006)
+        f.release()
+        f.frame(body)
+        clicks = 0
+        f.moveTo(150, 27)                           // on the title, where the upper half would be
+        f.press()
+        f.frame(body)
+        XCTAssertEqual(clicks, 0)
+    }
+
+    func testSectionFoldsAndRemembers() {
+        let f = Fixture()
+        var clicks = 0
+        var wasOpen = false
+        let body: (Gui) -> Void = { gui in
+            wasOpen = gui.section("Transform")
+            if wasOpen && gui.button("Inside") { clicks += 1 }
+            if gui.button("After") { clicks += 100 }
+        }
+        f.frame(body)
+        XCTAssertTrue(wasOpen)                      // sections start open
+        f.moveTo(150, Fixture.rowY(0))
+        f.press()
+        f.frame(body)
+        f.release()
+        f.frame(body)
+        XCTAssertFalse(wasOpen)                     // a click on the title folds it
+        // The button after it moved up into the second row.
+        f.moveTo(150, Fixture.rowY(1))
+        f.press()
+        f.frame(body)
+        XCTAssertEqual(clicks, 100)
+        f.release()
+        f.frame(body)
+        f.frame(body)
+        XCTAssertFalse(wasOpen)                     // and it stays folded
+    }
+
+    func testFreeButtonsWorkOutsidePanels() {
+        let canvas = Canvas()
+        let input = Input()
+        let gui = Gui()
+        var tools = 0, saves = 0
+        func frame() {
+            canvas.begin(size: Vec2(800, 600))
+            gui.begin(canvas, input)
+            gui.bar(position: Vec2(0, 0), size: Vec2(800, 40))
+            if gui.iconButton(.move, position: Vec2(10, 6), size: Vec2(28, 28), tooltip: "Move", isSelected: true) { tools += 1 }
+            if gui.button("Save", position: Vec2(700, 6), size: Vec2(80, 28)) { saves += 1 }
+            gui.end()
+            input.endFrame()
+        }
+        func moveTo(_ x: Float, _ y: Float) {
+            input.handleMouseMove(position: Vec2(x, y), delta: Vec2(x, y) - input.mousePosition)
+        }
+        frame()
+        moveTo(24, 20)
+        frame()
+        XCTAssertTrue(gui.wantsMouse)               // the bar belongs to the interface
+        input.handleMouseButton(.left, down: true)
+        frame()
+        XCTAssertTrue(tools == 1 && saves == 0)
+        input.handleMouseButton(.left, down: false)
+        frame()
+        moveTo(740, 20)
+        input.handleMouseButton(.left, down: true)
+        frame()
+        XCTAssertTrue(tools == 1 && saves == 1)
+        input.handleMouseButton(.left, down: false)
+        moveTo(400, 300)
+        frame()
+        frame()
+        XCTAssertFalse(gui.wantsMouse)              // the 3D view below the bar is free
+
+        // Every icon can be drawn, at any size.
+        canvas.begin(size: Vec2(800, 600))
+        gui.begin(canvas, input)
+        for (index, icon) in Gui.Icon.allCases.enumerated() {
+            gui.icon(icon, center: Vec2(20 + Float(index) * 30, 100), size: 16, rgb(0xffffff))
+        }
+        gui.end()
+        XCTAssertGreaterThan(canvas.vertices.count, 500)
+        XCTAssertTrue(canvas.vertices.allSatisfy { $0.position.x.isFinite && $0.position.y.isFinite })
     }
 }

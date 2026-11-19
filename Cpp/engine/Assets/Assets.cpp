@@ -96,6 +96,11 @@ std::shared_ptr<Mesh> Assets::makeMesh(const MeshData& data) {
     return std::make_shared<Mesh>(device_, data);
 }
 
+std::shared_ptr<Texture> Assets::makeTexture(const std::vector<uint8_t>& pixels, int width, int height, TextureFormat format) {
+    if (width <= 0 || height <= 0 || pixels.size() < size_t(width) * size_t(height) * (format == TextureFormat::R8 ? 1 : 4)) return nullptr;
+    return Texture::fromPixels(device_, pixels.data(), width, height, format, true);
+}
+
 std::shared_ptr<Material> Assets::makeMaterial(Vec4 baseColor, float metallic, float roughness) {
     auto material = std::make_shared<Material>();
     material->baseColor = baseColor;

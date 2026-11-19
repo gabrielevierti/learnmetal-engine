@@ -314,6 +314,10 @@ void Renderer::render(Scene& scene, const Canvas& canvas, const RenderTarget& ta
     frame.sunDiskSize = std::cos(settings.sky.sunAngularRadius);
     frame.fogColor = settings.fogColor;
     frame.fogDensity = settings.fogDensity;
+    frame.cloudCoverage = settings.sky.cloudCoverage;
+    frame.cloudScale = settings.sky.cloudScale;
+    frame.cloudOffset = settings.sky.cloudSpeed * float(time);
+    time_ = time;
 
     // ---- what the camera can see, in the order it will be drawn
     Frustum frustum(view.viewProjection);
