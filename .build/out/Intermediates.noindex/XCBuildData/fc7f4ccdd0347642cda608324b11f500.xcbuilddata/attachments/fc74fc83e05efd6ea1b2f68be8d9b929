@@ -1,0 +1,399 @@
+{
+  "" : {
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/LMEngine-primary.dia",
+    "emit-module-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/LMEngine-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/LMEngine-primary-emit-module.dia",
+    "pch" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/LMEngine-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/LMEngine-primary.swiftdeps"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Assets/Assets.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Assets.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Assets.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Assets.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Assets.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Assets.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Assets.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Assets.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Assets~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Assets/Font.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Font.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Font.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Font.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Font.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Font.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Font.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Font.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Font~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Assets/MeshData.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/MeshData.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/MeshData.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/MeshData.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/MeshData.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/MeshData.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/MeshData.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/MeshData.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/MeshData~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Audio/Audio.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Audio.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Audio.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Audio.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Audio.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Audio.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Audio.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Audio.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Audio~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Audio/AudioClip.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/AudioClip.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/AudioClip.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/AudioClip.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/AudioClip.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/AudioClip.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/AudioClip.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/AudioClip.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/AudioClip~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Audio/Mixer.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mixer.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mixer.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mixer.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mixer.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mixer.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mixer.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mixer.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mixer~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Core/Engine.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Engine.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Engine.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Engine.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Engine.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Engine.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Engine.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Engine.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Engine~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Core/Game.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Game.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Game.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Game.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Game.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Game.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Game.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Game.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Game~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Core/Log.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Log.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Log.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Log.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Log.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Log.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Log.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Log.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Log~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Core/Paths.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Paths.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Paths.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Paths.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Paths.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Paths.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Paths.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Paths.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Paths~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Core/Time.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Time.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Time.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Time.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Time.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Time.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Time.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Time.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Time~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Input/Input.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Input.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Input.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Input.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Input.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Input.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Input.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Input.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Input~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Math/Math.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Math.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Math.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Math.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Math.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Math.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Math.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Math.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Math~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Physics/Collision.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Collision.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Collision.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Collision.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Collision.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Collision.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Collision.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Collision.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Collision~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Physics/Physics.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Physics.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Physics.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Physics.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Physics.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Physics.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Physics.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Physics.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Physics~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Platform/EngineView.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Platform/Gamepads.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Platform/Surface.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Platform/Window.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/Canvas.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/Cascades.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Cascades.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Cascades.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Cascades.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Cascades.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Cascades.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Cascades.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Cascades.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Cascades~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/DebugDraw.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/DebugDraw.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/DebugDraw.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/DebugDraw.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/DebugDraw.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/DebugDraw.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/DebugDraw.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/DebugDraw.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/DebugDraw~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/Environment.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Environment.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Environment.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Environment.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Environment.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Environment.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Environment.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Environment.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Environment~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/FrameAllocator.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/FrameAllocator.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/FrameAllocator.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/FrameAllocator.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/FrameAllocator.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/FrameAllocator.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/FrameAllocator.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/FrameAllocator.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/FrameAllocator~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/GPUTypes.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GPUTypes.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GPUTypes.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GPUTypes.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GPUTypes.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GPUTypes.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GPUTypes.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GPUTypes.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GPUTypes~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/GraphicsDevice.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GraphicsDevice.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GraphicsDevice.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GraphicsDevice.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GraphicsDevice.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GraphicsDevice.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GraphicsDevice.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GraphicsDevice.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/GraphicsDevice~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/ImageDecoder.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ImageDecoder.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ImageDecoder.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ImageDecoder.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ImageDecoder.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ImageDecoder.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ImageDecoder.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ImageDecoder.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ImageDecoder~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/Material.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Material.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Material.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Material.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Material.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Material.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Material.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Material.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Material~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/Mesh.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mesh.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mesh.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mesh.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mesh.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mesh.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mesh.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mesh.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Mesh~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/Particles.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Particles.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Particles.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Particles.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Particles.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Particles.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Particles.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Particles.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Particles~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/RenderPasses.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/RenderPasses.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/RenderPasses.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/RenderPasses.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/RenderPasses.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/RenderPasses.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/RenderPasses.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/RenderPasses.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/RenderPasses~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/Renderer.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Renderer.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Renderer.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Renderer.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Renderer.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Renderer.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Renderer.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Renderer.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Renderer~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/ShaderLibrary.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderLibrary.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderLibrary.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderLibrary.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderLibrary.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderLibrary.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderLibrary.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderLibrary.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderLibrary~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/ShaderSource.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderSource.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderSource.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderSource.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderSource.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderSource.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderSource.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderSource.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/ShaderSource~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/Texture.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Texture.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Texture.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Texture.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Texture.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Texture.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Texture.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Texture.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Texture~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Scene/Components.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Components.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Components.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Components.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Components.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Components.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Components.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Components.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Components~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Scene/Scene.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Scene.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Scene.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Scene.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Scene.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Scene.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Scene.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Scene.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Scene~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Scene/SceneFile.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/SceneFile.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/SceneFile.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/SceneFile.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/SceneFile.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/SceneFile.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/SceneFile.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/SceneFile.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/SceneFile~partial.swiftmodule"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/UI/Gui.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gui.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gui.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gui.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gui.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gui.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gui.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gui.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gui~partial.swiftmodule"
+  }
+}

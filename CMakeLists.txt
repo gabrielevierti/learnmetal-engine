@@ -8,7 +8,7 @@
 # The four libraries it uses are downloaded by CMake the first time (see below).
 cmake_minimum_required(VERSION 3.24)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 13.0 CACHE STRING "Oldest macOS the programs run on")
-project(LearnMetalEngine LANGUAGES C CXX OBJCXX)
+project(LearnMetalEngine LANGUAGES C CXX OBJC OBJCXX)
 
 if(NOT APPLE)
     message(FATAL_ERROR "Metal only exists on Apple platforms: this project builds on macOS.")

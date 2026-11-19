@@ -1,0 +1,37 @@
+{
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Platform/EngineView.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.dia",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/EngineView.swiftdeps"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Platform/Gamepads.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.dia",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Gamepads.swiftdeps"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Platform/Surface.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.dia",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Surface.swiftdeps"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Platform/Window.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.dia",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Window.swiftdeps"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/LMEngine/Rendering/Canvas.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.dia",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/LMEngine-t.build/Objects-normal/arm64/Canvas.swiftdeps"
+  }
+}

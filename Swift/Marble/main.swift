@@ -10,13 +10,17 @@
 import Foundation
 import LMEngine
 
-var defaults = EngineConfig()
-defaults.title = "Marble"
-let engine = Engine(config: EngineConfig.fromArguments(CommandLine.arguments, defaults: defaults))
-let game = MarbleGame()
-var result = engine.run(game)
-if result == 0 && game.isDemo && engine.window == nil && !game.hasWon {
-    logError("the autopilot did not finish the course")
-    result = 1
+// The engine lives on the main actor, and so does everything a program does with it.
+let result: Int32 = MainActor.assumeIsolated {
+    var defaults = EngineConfig()
+    defaults.title = "Marble"
+    let engine = Engine(config: EngineConfig.fromArguments(CommandLine.arguments, defaults: defaults))
+    let game = MarbleGame()
+    let result = engine.run(game)
+    if result == 0 && game.isDemo && engine.window == nil && !game.hasWon {
+        logError("the autopilot did not finish the course")
+        return 1
+    }
+    return result
 }
 exit(result)

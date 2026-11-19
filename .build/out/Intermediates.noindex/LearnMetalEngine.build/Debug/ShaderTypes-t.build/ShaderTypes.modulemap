@@ -1,0 +1,4 @@
+module ShaderTypes {
+umbrella header "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Shaders/Shared/ShaderTypes.h"
+export *
+}

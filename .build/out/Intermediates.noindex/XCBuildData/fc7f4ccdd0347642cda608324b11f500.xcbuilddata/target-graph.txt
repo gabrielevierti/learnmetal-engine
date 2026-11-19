@@ -1,0 +1,11 @@
+Target dependency graph (4 targets)
+Target 'FPV-product' in project 'LearnMetalEngine'
+➜ Explicit dependency on target 'ShaderTypes' in project 'LearnMetalEngine'
+➜ Explicit dependency on target 'LMEngine' in project 'LearnMetalEngine'
+➜ Explicit dependency on target 'FPVKit' in project 'LearnMetalEngine'
+Target 'FPVKit' in project 'LearnMetalEngine'
+➜ Explicit dependency on target 'ShaderTypes' in project 'LearnMetalEngine'
+➜ Explicit dependency on target 'LMEngine' in project 'LearnMetalEngine'
+Target 'LMEngine' in project 'LearnMetalEngine'
+➜ Explicit dependency on target 'ShaderTypes' in project 'LearnMetalEngine'
+Target 'ShaderTypes' in project 'LearnMetalEngine' (no dependencies)

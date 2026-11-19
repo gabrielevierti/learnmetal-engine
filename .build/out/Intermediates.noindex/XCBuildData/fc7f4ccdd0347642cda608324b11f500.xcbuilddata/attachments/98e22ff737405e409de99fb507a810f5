@@ -1,0 +1,19 @@
+{
+  "" : {
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/FPV-primary.dia",
+    "emit-module-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/FPV-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/FPV-primary-emit-module.dia",
+    "pch" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/FPV-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/FPV-primary.swiftdeps"
+  },
+  "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/Swift/FPV/main.swift" : {
+    "const-values" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/main.swiftconstvalues",
+    "dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/main.d",
+    "diagnostics" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/main.dia",
+    "index-unit-output-path" : "/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/main.o",
+    "llvm-bc" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/main.bc",
+    "object" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/main.o",
+    "swift-dependencies" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/main.swiftdeps",
+    "swiftmodule" : "/Users/gabrielevierti/Documents/GitHub/learnmetal-engine/.build/out/Intermediates.noindex/LearnMetalEngine.build/Debug/FPV-p.build/Objects-normal/arm64/main~partial.swiftmodule"
+  }
+}

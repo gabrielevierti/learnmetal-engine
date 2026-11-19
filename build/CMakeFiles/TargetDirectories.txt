@@ -1,0 +1,16 @@
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/CMakeFiles/lmengine.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/CMakeFiles/marble.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/CMakeFiles/fpv.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/CMakeFiles/editor.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/CMakeFiles/lmtests.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/CMakeFiles/test.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/CMakeFiles/edit_cache.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/CMakeFiles/rebuild_cache.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/_deps/glfw-build/CMakeFiles/test.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/_deps/glfw-build/CMakeFiles/edit_cache.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/_deps/glfw-build/CMakeFiles/rebuild_cache.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/_deps/glfw-build/src/CMakeFiles/glfw.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/_deps/glfw-build/src/CMakeFiles/update_mappings.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/_deps/glfw-build/src/CMakeFiles/test.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/_deps/glfw-build/src/CMakeFiles/edit_cache.dir
+/Users/gabrielevierti/Downloads/learnmetal-engine/build/_deps/glfw-build/src/CMakeFiles/rebuild_cache.dir

@@ -11,7 +11,11 @@ import Foundation
 import FPVKit
 import LMEngine
 
-var defaults = EngineConfig()
-defaults.title = "FPV"
-let engine = Engine(config: EngineConfig.fromArguments(CommandLine.arguments, defaults: defaults))
-exit(engine.run(FPVGame()))
+// The engine lives on the main actor, and so does everything a program does with it.
+let result: Int32 = MainActor.assumeIsolated {
+    var defaults = EngineConfig()
+    defaults.title = "FPV"
+    let engine = Engine(config: EngineConfig.fromArguments(CommandLine.arguments, defaults: defaults))
+    return engine.run(FPVGame())
+}
+exit(result)

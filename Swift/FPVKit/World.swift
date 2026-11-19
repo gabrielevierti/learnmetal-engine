@@ -45,6 +45,7 @@ private func tilingNoise(_ p: Vec2, period: Float, octaves: Int, seed: UInt32) -
 
 /// Grass, as a texture: greens that vary in patches and from blade to blade. A mowed
 /// field also shows the two directions the mower went, as lighter and darker bands.
+@MainActor
 private func grassTexture(_ assets: Assets, mowed: Bool) -> Texture? {
     let size = 256
     var pixels = [UInt8](repeating: 255, count: size * size * 4)
@@ -77,6 +78,7 @@ public struct World {
 }
 
 /// Makes boxes of any size that share one mesh per size and repeat their texture per meter.
+@MainActor
 private final class Builder {
     let engine: Engine
     private var meshes: [String: Mesh] = [:]
@@ -113,6 +115,7 @@ private final class Builder {
 
 /// A gate is a frame of bars around its opening: two posts and a bar on top, and a bar
 /// below if the opening does not reach the ground.
+@MainActor
 private func buildGate(_ builder: Builder, _ gate: Gate, _ material: Material) -> [Entity] {
     let thickness: Float = 0.28
     let top = gate.center.y + gate.height * 0.5
@@ -132,6 +135,7 @@ private func buildGate(_ builder: Builder, _ gate: Gate, _ material: Material) -
     }
 }
 
+@MainActor
 public func buildWorld(_ engine: Engine) -> World {
     let scene = engine.scene
     let assets = engine.assets
@@ -302,6 +306,7 @@ public struct DroneModel {
 
     public init() {}
 
+    @MainActor
     public static func build(_ engine: Engine, _ a: Airframe) -> DroneModel {
         let scene = engine.scene
         let assets = engine.assets
@@ -364,6 +369,7 @@ public struct DroneModel {
     }
 
     /// Moves the model to where the drone is and turns the propellers.
+    @MainActor
     public mutating func update(_ engine: Engine, _ drone: Drone, dt: Float) {
         let scene = engine.scene
         guard var transform = scene[root, Transform.self] else { return }
@@ -382,6 +388,7 @@ public struct DroneModel {
         }
     }
 
+    @MainActor
     public mutating func destroy(_ engine: Engine) {
         for entity in parts { engine.scene.destroy(entity) }
         engine.scene.destroy(root)

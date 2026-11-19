@@ -11,6 +11,7 @@ private let red = rgb(0xff5a4d)
 private let white = Vec4(1, 1, 1, 0.96)
 
 /// Text that stays readable over sky and over grass: white on its own dark shadow.
+@MainActor
 private func osd(_ canvas: Canvas, _ text: String, _ position: Vec2, size: Float, align: TextAlign = .left, _ color: Vec4 = white) {
     canvas.text(text, position + Vec2(1, 1.5), size: size, Vec4(0, 0, 0, 0.65 * color.w), align: align)
     canvas.text(text, position, size: size, color, align: align)

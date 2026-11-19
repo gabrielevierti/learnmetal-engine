@@ -10,14 +10,18 @@
 import Foundation
 import LMEngine
 
-var defaults = EngineConfig()
-defaults.title = "LearnMetal Editor"
-defaults.width = 1440
-defaults.height = 860
-let config = EngineConfig.fromArguments(CommandLine.arguments, defaults: defaults)
-let engine = Engine(config: config)
-let editor = Editor()
-for argument in config.arguments where !argument.hasPrefix("-") {
-    editor.sceneName = argument
+// The engine lives on the main actor, and so does everything a program does with it.
+let result: Int32 = MainActor.assumeIsolated {
+    var defaults = EngineConfig()
+    defaults.title = "LearnMetal Editor"
+    defaults.width = 1440
+    defaults.height = 860
+    let config = EngineConfig.fromArguments(CommandLine.arguments, defaults: defaults)
+    let engine = Engine(config: config)
+    let editor = Editor()
+    for argument in config.arguments where !argument.hasPrefix("-") {
+        editor.sceneName = argument
+    }
+    return engine.run(editor)
 }
-exit(engine.run(editor))
+exit(result)

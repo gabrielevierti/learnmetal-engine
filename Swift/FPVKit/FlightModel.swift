@@ -254,8 +254,8 @@ public struct Drone {
     }
 
     /// Level, still, motors stopped, facing `heading` (radians, 0 toward -Z, positive to the left).
-    public mutating func place(at where: Vec3, heading newHeading: Float) {
-        position = where
+    public mutating func place(at spot: Vec3, heading newHeading: Float) {
+        position = spot
         velocity = Vec3(0, 0, 0)
         rotation = Quat(angle: newHeading, axis: Vec3(0, 1, 0))
         angularVelocity = Vec3(0, 0, 0)
