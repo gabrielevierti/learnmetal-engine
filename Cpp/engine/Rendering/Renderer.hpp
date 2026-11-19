@@ -1,0 +1,196 @@
+// Renderer.hpp
+// Draws a Scene.
+//
+// Every frame goes through the same sequence of passes:
+//
+//   1. shadow maps     the scene seen from the sun, once per cascade        (depth only)
+//   2. depth pre-pass  depth and normals of what the camera sees            (only if SSAO is on)
+//   3. SSAO            how hidden each pixel is from the sky, then a blur
+//   4. main pass       opaque objects, sky, transparent objects, particles, debug lines
+//                      into a multisampled, floating-point (HDR) target
+//   5. bloom           bright areas blurred through a chain of smaller and smaller textures
+//   6. final pass      tone mapping onto the screen, then the 2D canvas on top
+//
+// Before any of that, the renderer walks the scene once and builds plain lists of what
+// to draw ("extraction"): it finds the camera and the lights, drops objects outside the
+// view, sorts, and groups objects that share a mesh and a material into instanced draws.
+#pragma once
+
+#include "Rendering/Canvas.hpp"
+#include "Rendering/Cascades.hpp"
+#include "Rendering/DebugDraw.hpp"
+#include "Rendering/Environment.hpp"
+#include "Rendering/FrameAllocator.hpp"
+#include "Rendering/Material.hpp"
+#include "Scene/Scene.hpp"
+
+#include <dispatch/dispatch.h>
+
+#include <memory>
+#include <vector>
+
+namespace lm {
+
+/// The colors are radiance, in the same units as light intensities. A clear sky is several
+/// times darker than a white wall in sunlight; keeping that ratio is what makes shadows read.
+struct SkySettings {
+    Vec3 zenithColor{0.05f, 0.15f, 0.42f};
+    Vec3 horizonColor{0.38f, 0.52f, 0.72f};
+    Vec3 groundColor{0.11f, 0.14f, 0.19f};      // what is seen, and reflected, below the horizon
+    float intensity = 1.0f;
+    float sunDiskIntensity = 30.0f;             // how much brighter than the sunlight the disk itself looks
+    float sunAngularRadius = radians(1.2f);
+};
+
+struct RenderSettings {
+    int sampleCount = 4;                        // multisampling: 1 (off), 2 or 4
+    float renderScale = 1.0f;                   // below 1 renders the scene smaller and stretches it
+
+    bool shadowsEnabled = true;
+    CascadeSettings cascades;
+    float shadowBias = 0.0001f;                 // in shadow-map depth, on top of the normal offset
+    float shadowNormalOffset = 2.0f;            // in shadow-map texels; 2 covers the 3 x 3 filter
+
+    SkySettings sky;
+    float environmentIntensity = 1.0f;          // strength of the image-based lighting
+
+    Vec3 fogColor{0.38f, 0.52f, 0.72f};
+    float fogDensity = 0.0f;                    // 0 turns fog off
+
+    bool ambientOcclusionEnabled = true;
+    float ambientOcclusionRadius = 0.6f;        // in world units
+    float ambientOcclusionIntensity = 1.0f;
+    float ambientOcclusionPower = 1.5f;
+
+    bool bloomEnabled = true;
+    float bloomIntensity = 0.06f;
+    float bloomThreshold = 1.0f;
+    float bloomKnee = 0.5f;
+
+    float exposure = 1.0f;
+    int toneMapper = 0;                         // 0 ACES, 1 Reinhard, 2 none
+    float vignette = 0.25f;
+};
+
+struct RenderStats {
+    int drawCalls = 0;
+    int instances = 0;
+    int triangles = 0;
+    int visibleObjects = 0;
+    int culledObjects = 0;
+    int lights = 0;
+};
+
+/// Where the finished frame goes: a drawable's texture, or any texture when rendering off screen.
+struct RenderTarget {
+    MTL::Texture* texture = nullptr;
+    MTL::Drawable* drawable = nullptr;          // presented after the frame, if set
+};
+
+class Renderer {
+public:
+    Renderer(GraphicsDevice& device, const std::string& shaderDirectory);
+    ~Renderer();
+
+    RenderSettings settings;
+    RenderStats stats;                          // of the last frame
+    DebugDraw debug;                            // lines to draw with the next frame
+
+    /// If this entity has a Camera, the renderer looks through it whatever the scene's own
+    /// cameras say. An editor uses it to look around without touching the scene.
+    Entity cameraOverride;
+
+    /// Draws the scene and the canvas into `target`. `time` is in seconds, for shaders.
+    void render(Scene& scene, const Canvas& canvas, const RenderTarget& target, double time);
+
+    /// Draws a frame into memory instead: `width` x `height` pixels, four bytes each (red,
+    /// green, blue, alpha), rows from the top. For screenshots and for running without a window.
+    std::vector<uint8_t> renderToImage(Scene& scene, const Canvas& canvas, int width, int height, double time);
+
+    GraphicsDevice& device() { return device_; }
+    ShaderLibrary& shaders() { return shaders_; }
+    /// Blocks until the GPU has finished every frame submitted so far.
+    void waitUntilIdle();
+
+private:
+    struct DrawItem {
+        const Mesh* mesh = nullptr;
+        const Material* material = nullptr;
+        Mat4 world;
+        Vec4 tint;
+        AABB bounds;                            // in world space
+        float distanceSquared = 0;              // from the camera
+        bool castsShadows = true;
+    };
+
+    /// One instanced draw call: `count` copies of a mesh with one material.
+    struct Batch {
+        const Mesh* mesh = nullptr;
+        const Material* material = nullptr;
+        FrameAllocator::Allocation instances;
+        uint32_t count = 0;
+    };
+
+    struct View {
+        Mat4 world, view, projection, viewProjection;
+        Vec3 position{0, 0, 0};
+        float fovY = radians(60.0f), aspect = 1, nearPlane = 0.1f, farPlane = 500;
+    };
+
+    enum class MeshPass { Shadow, Prepass, Forward };
+
+    void ensureTargets(int width, int height);
+    void ensureShadowMap();
+    View findView(Scene& scene, float aspect) const;
+    void collectItems(Scene& scene, const View& view, std::vector<DrawItem>& items) const;
+    int collectLights(Scene& scene, gpu::LightData* lights, gpu::FrameUniforms& frame, bool& sunCastsShadows) const;
+    std::vector<Batch> makeBatches(std::vector<const DrawItem*>& items, bool sortByState);
+    gpu::PassUniforms makePassUniforms(const Mat4& view, const Mat4& projection, Vec3 position, int width, int height,
+                                       float nearPlane, float farPlane, double time) const;
+
+    void bindMaterial(MTL::RenderCommandEncoder* encoder, const Material& material);
+    void drawBatches(MTL::RenderCommandEncoder* encoder, const std::vector<Batch>& batches, MeshPass pass,
+                     MTL::PixelFormat colorFormat, int sampleCount);
+    void drawParticles(MTL::RenderCommandEncoder* encoder, Scene& scene, const View& view);
+    void drawDebugLines(MTL::RenderCommandEncoder* encoder);
+    void drawCanvas(MTL::RenderCommandEncoder* encoder, const Canvas& canvas, MTL::PixelFormat format);
+    void renderShadows(MTL::CommandBuffer* commandBuffer, const std::vector<DrawItem>& items, const Cascades& cascades);
+    void renderOcclusion(MTL::CommandBuffer* commandBuffer, const std::vector<Batch>& opaque, const View& view,
+                         const FrameAllocator::Allocation& passUniforms);
+    void renderScene(MTL::CommandBuffer* commandBuffer, Scene& scene, const std::vector<Batch>& opaque,
+                     const std::vector<Batch>& transparent, const View& view, const FrameAllocator::Allocation& passUniforms,
+                     const FrameAllocator::Allocation& frameUniforms, const FrameAllocator::Allocation& lights);
+    void renderBloom(MTL::CommandBuffer* commandBuffer);
+    void renderFinal(MTL::CommandBuffer* commandBuffer, const Canvas& canvas, const RenderTarget& target);
+    void drawFullscreen(MTL::CommandBuffer* commandBuffer, MTL::Texture* target, const char* fragmentFunction, BlendMode blend,
+                        bool keepContents, const void* uniforms, size_t uniformsSize, MTL::Texture* source0, MTL::Texture* source1,
+                        MTL::SamplerState* sampler0);
+
+    FrameAllocator& allocator() { return allocators_[frameIndex_]; }
+
+    static constexpr int kFramesInFlight = 3;
+    static constexpr MTL::PixelFormat kSceneFormat = MTL::PixelFormatRGBA16Float;
+    static constexpr MTL::PixelFormat kDepthFormat = MTL::PixelFormatDepth32Float;
+
+    GraphicsDevice& device_;
+    ShaderLibrary shaders_;
+    Environment environment_;
+    FrameAllocator allocators_[kFramesInFlight];
+    int frameIndex_ = 0;
+    uint64_t frameNumber_ = 0;
+    dispatch_semaphore_t frameSemaphore_;
+
+    std::shared_ptr<Texture> white_, flatNormal_;
+    Material defaultMaterial_;
+
+    int targetWidth_ = 0, targetHeight_ = 0, targetSamples_ = 0;
+    bool targetHasOcclusion_ = false;
+    NS::SharedPtr<MTL::Texture> sceneColorMultisample_, sceneDepth_, sceneColor_;
+    NS::SharedPtr<MTL::Texture> prepassDepth_, prepassNormal_, occlusionRaw_, occlusion_;
+    std::vector<NS::SharedPtr<MTL::Texture>> bloom_;
+    NS::SharedPtr<MTL::Texture> shadowMap_;
+    int shadowMapSize_ = 0, shadowMapSlices_ = 0;
+    NS::SharedPtr<MTL::Texture> imageTarget_;       // for renderToImage
+};
+
+}  // namespace lm
