@@ -20,8 +20,6 @@
 
 It ships with **Marble**, a complete little game (roll through a course of floating platforms, collect eight gems, reach the goal), an **editor** made with the engine itself to build scenes without writing code, and **FPV**, a second game that flies a racing drone through gates on an iPhone, an iPad or a Mac.
 
-![The marble on a stone bridge, gems ahead, a ramp to the right](Docs/marble.jpg)
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="Docs/readme/features-dark.svg">
   <img src="Docs/readme/features-light.svg" width="100%" alt="Features: physically based rendering; one engine in two languages; everything a game needs; a scene editor; two complete games; follows the LearnMetal tutorials.">
@@ -105,8 +103,6 @@ Both games and the editor take the same options: `--fullscreen`, `--width N`, `-
 
 ## FPV, the drone game
 
-![The view from the drone: a green gate ahead, flags, trees and hills, with battery, link and speed over the picture](Docs/fpv.jpg)
-
 Fly a racing drone from its own camera: a two-lap race through eight gates against the clock, or free flight over a field with trees to round and an unfinished building to thread.
 
 The drone is **simulated, not animated**. It is a rigid body with four motors, and everything a pilot feels comes out of the physics:
@@ -119,8 +115,6 @@ The drone is **simulated, not animated**. It is a rigid body with four motors, a
 - **A radio link.** It weakens with distance and behind obstacles. The picture tears before the link drops, and when it drops the motors stop.
 
 Two drones are built in: a **5-inch freestyle quad** on six cells (650 g, about 130 km/h) and a **2-inch ducted whoop** on two cells, 95 mm across, the size of a BETAFPV Cetus X (82 g, about 50 km/h). Angle mode levels the drone for you; Acro is how FPV pilots really fly.
-
-![Seen from behind: the drone, its shadow on the grass, and the first gate](Docs/fpv-chase.jpg)
 
 ```sh
 swift run FPV                  # Swift, on a Mac
